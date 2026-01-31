@@ -4,7 +4,7 @@ from Increment import Increment
 from pattern_tree.Pattern_tree_map import Pettern_tree_map
 
 def main():
-    data_storage = Data_Storage('AAPL', '2020-01-01', '2023-01-01', 1)
+    data_storage = Data_Storage('AAPL', '2020-01-01', '2023-01-01', 5)
     data = data_storage.get_data()
     direction_list = data["Direction"]
 

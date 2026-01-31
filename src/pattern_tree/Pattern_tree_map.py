@@ -80,21 +80,22 @@ class Pettern_tree_map:
         leaf.update_with_increment(increment)
 
     def print_tree(self):
-        """Print the tree; each node shows key and calculated info (count, total_weight, ang_return)."""
+        """Print the tree; each node shows path so far, key and calculated info (count, total_weight, ang_return)."""
         if self._root is None:
             print("(empty tree)")
             return
-        self._print_node(self._root, indent=0)
+        self._print_node(self._root, indent=0, path=[])
 
-    def _print_node(self, leaf, indent):
+    def _print_node(self, leaf, indent, path):
         prefix = "  " * indent
+        path_str = "".join(path) if path else "(root)"
         label = "root" if leaf.get_key() is None else f"direction '{leaf.get_key()}'"
-        print(f"{prefix}{label}")
+        print(f"{prefix}{label}  path={path_str}")
         print(f"{prefix}  count={leaf.get_count()}, total_weight={leaf.get_total_weight()}, ang_return={leaf.get_ang_return()}")
         if leaf.get_left() is not None:
-            self._print_node(leaf.get_left(), indent + 1)
+            self._print_node(leaf.get_left(), indent + 1, path + ["0"])
         if leaf.get_right() is not None:
-            self._print_node(leaf.get_right(), indent + 1)
+            self._print_node(leaf.get_right(), indent + 1, path + ["1"])
 
     def count_nodes_at_depth(self, depth):
         """Return the number of nodes at the given depth (root is depth 0)."""

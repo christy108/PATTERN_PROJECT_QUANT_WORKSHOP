@@ -11,7 +11,7 @@ class Pettern_tree_leaf:
         self.right = None
         self.count = 0
         self.total_weight = 0.0
-        self.ang_return = None
+        self.avg_return = None
 
     def get_key(self):
         return self.key
@@ -31,8 +31,8 @@ class Pettern_tree_leaf:
     def get_total_weight(self):
         return self.total_weight
 
-    def get_ang_return(self):
-        return self.ang_return
+    def get_avg_return(self):
+        return self.avg_return
 
     def set_key(self, key):
         self.key = key
@@ -52,17 +52,17 @@ class Pettern_tree_leaf:
     def set_total_weight(self, total_weight):
         self.total_weight = total_weight
 
-    def set_ang_return(self, ang_return):
-        self.ang_return = ang_return
+    def set_avg_return(self, avg_return):
+        self.avg_return = avg_return
 
     def is_leaf(self):
         return self.left is None and self.right is None
 
     def update_with_increment(self, increment):
-        """Update count, total_weight, and ang_return from an Increment. Skip ang_return when return is NaN."""
+        """Update count, total_weight, and avg_return from an Increment. Skip avg_return when return is NaN."""
         self.count += 1
         self.total_weight += increment.get_weights()
         ret = increment.get_returns()
         if ret is not None and not (isinstance(ret, float) and math.isnan(ret)):
-            old_avg = self.ang_return if self.ang_return is not None else 0.0
-            self.ang_return = old_avg + (ret - old_avg) / self.count
+            old_avg = self.avg_return if self.avg_return is not None else 0.0
+            self.avg_return = old_avg + (ret - old_avg) / self.count

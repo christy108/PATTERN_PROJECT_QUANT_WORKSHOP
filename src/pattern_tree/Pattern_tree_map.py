@@ -80,7 +80,7 @@ class Pettern_tree_map:
         leaf.update_with_increment(increment)
 
     def print_tree(self):
-        """Print the tree; each node shows path so far, key and calculated info (count, total_weight, ang_return)."""
+        """Print the tree; each node shows path so far, key and calculated info (count, total_weight, avg_return)."""
         if self._root is None:
             print("(empty tree)")
             return
@@ -91,7 +91,7 @@ class Pettern_tree_map:
         path_str = "".join(path) if path else "(root)"
         label = "root" if leaf.get_key() is None else f"direction '{leaf.get_key()}'"
         print(f"{prefix}{label}  path={path_str}")
-        print(f"{prefix}  count={leaf.get_count()}, total_weight={leaf.get_total_weight()}, ang_return={leaf.get_ang_return()}")
+        print(f"{prefix}  count={leaf.get_count()}, total_weight={leaf.get_total_weight()}, avg_return={leaf.get_avg_return()}")
         if leaf.get_left() is not None:
             self._print_node(leaf.get_left(), indent + 1, path + ["0"])
         if leaf.get_right() is not None:

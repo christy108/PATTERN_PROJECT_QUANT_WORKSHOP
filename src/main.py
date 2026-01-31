@@ -31,6 +31,8 @@ def main():
 
     tree.print_tree()
 
+    tree.print_paths_with_expected_return_bounded(lower=-0.005, upper=0.005)
+
 
 if __name__ == "__main__":
     main()

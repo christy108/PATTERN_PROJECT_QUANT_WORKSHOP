@@ -12,6 +12,9 @@ class Pettern_tree_leaf:
         self.count = 0
         self.total_weight = 0.0
         self.avg_return = None
+        self.expected_return = None
+        self.probability_of_rising = None
+        self.total_children_count = 0
 
     def get_key(self):
         return self.key
@@ -34,6 +37,15 @@ class Pettern_tree_leaf:
     def get_avg_return(self):
         return self.avg_return
 
+    def get_expected_return(self):
+        return self.expected_return
+
+    def get_probability_of_rising(self):
+        return self.probability_of_rising
+
+    def get_total_children_count(self):
+        return self.total_children_count
+
     def set_key(self, key):
         self.key = key
 
@@ -54,6 +66,15 @@ class Pettern_tree_leaf:
 
     def set_avg_return(self, avg_return):
         self.avg_return = avg_return
+
+    def set_expected_return(self, expected_return):
+        self.expected_return = expected_return
+
+    def set_probability_of_rising(self, probability_of_rising):
+        self.probability_of_rising = probability_of_rising
+
+    def set_total_children_count(self, total_children_count):
+        self.total_children_count = total_children_count
 
     def is_leaf(self):
         return self.left is None and self.right is None

@@ -61,5 +61,6 @@ def main():
 
 
 if __name__ == "__main__":
+    print("Hello Leo")
     print("Hello World")
     main()

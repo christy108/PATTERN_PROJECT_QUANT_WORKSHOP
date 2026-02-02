@@ -37,7 +37,7 @@ def main():
 
 
     #---Print Tree---
-    #tree.print_tree()
+    tree.compute_derived_stats()
     # tree.print_paths_with_expected_return_bounded(lower=-0.015, upper=0.015)
 
 

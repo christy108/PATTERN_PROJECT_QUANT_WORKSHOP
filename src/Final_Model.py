@@ -6,19 +6,16 @@ from pattern_tree.Pattern_tree_map import Pettern_tree_map
 import numpy as np
 from Weighted_Average import calculate_weighted_averages, weights_to_average
 
-def main():
-
-    #---Download Data + Manipulate---
-    data_storage = Data_Storage('TSLA', '2020-01-01', '2023-01-01', 1)
 
 
-  
+def Generate_predictions():
 
+    
     #Decide on the weights splitting
     #data_storage.update_weights_splitting(10)
     
 
-    data = data_storage.get_data()
+    data = data_storage_object.get_data()
     print(data.head())
     direction_list = data["Direction"]
 

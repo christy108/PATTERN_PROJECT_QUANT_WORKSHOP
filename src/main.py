@@ -10,36 +10,38 @@ def main():
     data_storage = Data_Storage('TSLA', '2020-01-01', '2023-01-01')
     
 
-    data = data_storage.get_data()
+    meta_data = data_storage.get_data()
 
     #print(data)
 
-    
-    slice_data = data_storage.slice_data(data, lookback=50, index_to_start=100)
+    lookback = 50
+    index_to_start = 100
+    weight_recent_data= 20
+
+    slice_data = data_storage.slice_data(meta_data, lookback=lookback, index_to_start=index_to_start)
     print(slice_data)
     print(slice_data["Direction"])
    
-    #updated_slice = data_storage.update_weights_splitting_on_slice(slice_data, 9)
+    weight_updated_slice = data_storage.update_weights_splitting_on_slice(slice_data, weight_recent_data)
 
-    #print(updated_slice)
+    print(weight_updated_slice)
 
 
     #----old code---
-    direction_list = slice_data["Direction"]
-
+    direction_list = weight_updated_slice["Direction"]
     window = Sliding_window(direction_list, 1, 0)
     tree = Pettern_tree_map()
     n = len(direction_list)
 
-    #Sliding Window
+    #Sliding Window to get info at head increment
     for length in range(1, n + 1):
         print(f"window length: {length}")
         for i in window.get_start_indices_for_length(length):
             pattern = [str(d) for d in direction_list.iloc[i : i + length]]
             last_index = i + length - 1
             direction = direction_list.iloc[last_index]
-            ret = data["Returns"].iloc[last_index]
-            w = data["weights"].iloc[last_index]
+            ret = weight_updated_slice["Returns"].iloc[last_index]
+            w = weight_updated_slice["weights"].iloc[last_index]
             increment = Increment(direction, ret, w)
             tree.update_leaf_for_increment(pattern, increment)
 

@@ -7,19 +7,10 @@ import numpy as np
 from Weighted_Average import calculate_weighted_averages, weights_to_average
 
 def main():
-
-    #---Download Data + Manipulate---
     data_storage = Data_Storage('TSLA', '2020-01-01', '2023-01-01', 1)
-
-
-  
-
-    #Decide on the weights splitting
-    #data_storage.update_weights_splitting(10)
     
 
     data = data_storage.get_data()
-    print(data.head())
     direction_list = data["Direction"]
 
     window = Sliding_window(direction_list, 1, 0)
@@ -70,5 +61,6 @@ def main():
 
 
 if __name__ == "__main__":
-    
+    print("Hello Leo")
+    print("Hello World")
     main()

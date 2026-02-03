@@ -17,9 +17,20 @@ class Data_Storage:
     def get_data(self):
         return self.data
     
-    def set_data(self, data):
-        self.data = data
-        return self.data
+    def slice_data(self,data, lookback, index_to_start):
+        window_error = index_to_start - lookback + 1
+        if window_error < 0:
+            print(f"Warning: window error {abs(window_error)} < 0")
+            print(f"Increase index or decrease lookback by: {window_error}")
+        else:   
+
+            start_index = index_to_start + 1
+            end_index = index_to_start - lookback + 1
+            data = data.iloc[start_index:end_index]
+            print(f"Data sliced from index {start_index} to {end_index}"
+                  )
+            print(data)
+            return data
 
     # Main functions
     def update_weights_splitting_on_slice(self, slice_data, split_number_when_equally):

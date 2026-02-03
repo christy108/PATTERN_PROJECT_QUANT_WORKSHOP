@@ -29,10 +29,35 @@ def main():
     all_final_predictions, prediction_lags_length = get_final_prediction(data_storage, meta_data, index_to_start, lookback, weight_recent_data, Weight_type_in_lags, fringe_weight_if_triangle)
 
     #Get Recent lagged pattern and output prediction
-    lagged_pattern = "".join(map(str, Direction_list[-prediction_lags_length:]))
-    next_increment_prediction = all_final_predictions[lagged_pattern]
+    lagged_pattern_at_head = "".join(map(str, Direction_list[-prediction_lags_length:]))
+    next_increment_prediction = all_final_predictions[lagged_pattern_at_head]
     
-    print(next_increment_prediction)
+
+
+    #2--- Simulate the Trading
+
+    for i in range(index_to_start + 1 , meta_data.shape[0] - 2): #2??
+
+        current_head_index_of_window = i
+
+        #---Get predictions
+        all_final_predictions, prediction_lags_length  = get_final_prediction(data_storage, meta_data, current_head_index_of_window, lookback, weight_recent_data, Weight_type_in_lags, fringe_weight_if_triangle)
+        
+        
+        ####### WE ALSO HAVE TO UPDATE THE DIRECTION LIST write a fucntion splitting the data??
+
+
+        lagged_pattern_at_head = "".join(map(str, Direction_list[-prediction_lags_length:]))
+        next_increment_prediction = all_final_predictions[lagged_pattern_at_head]
+
+        predicted_return = next_increment_prediction["average_expected_return"]
+        predicted_probs = next_increment_prediction["average_probability_of_rising"]
+
+        print(lagged_pattern_at_head, predicted_return, predicted_probs, current_head_index_of_window )
+        
+
+
+    #print(lagged_pattern,next_increment_prediction, meta_data["Returns"].iloc[index_to_start])
 
 
     

@@ -1,4 +1,4 @@
-from pattern_tree.Populate_Tree_Predictions import populate_tree_predictions
+from pattern_tree.populate_tree_predictions import populate_tree_predictions
 from Weighted_Average import calculate_weighted_averages, weights_to_average
 
 
@@ -25,4 +25,4 @@ def get_final_prediction(data_storage, meta_data, index_to_start, lookback, weig
 
     #4---Average Expected Return and Probability of Rising pattern based on weights---
     final_prediction = calculate_weighted_averages(prediction_lags_length, tree, Weight_Probs)
-    return final_prediction
+    return final_prediction, prediction_lags_length

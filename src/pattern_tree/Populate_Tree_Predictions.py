@@ -1,7 +1,7 @@
 
 from Sliding_window import Sliding_window
 from Increment import Increment
-from pattern_tree.Pattern_tree_map import Pettern_tree_map
+from pattern_tree.pattern_tree_map import Pettern_tree_map
 
 
 #LATER WE CAN PUT THIS IN A CLASS

@@ -1,24 +1,38 @@
 from Data_Storage import Data_Storage
-from pattern_tree.Populate_Tree_Predictions import populate_tree_predictions
-from Weighted_Average import calculate_weighted_averages, weights_to_average
-from pattern_tree.Final_Prediction_slow import get_final_prediction
+from Final_Prediction_slow import get_final_prediction #Write efficient version later
 
 def main():
     data_storage = Data_Storage('TSLA', '2020-01-01', '2023-01-01')
     meta_data = data_storage.get_data()
+    Direction_list = meta_data['Direction']
+    
+
+    
+
+
 
     ####### PARAMETERS #######
 
-    index_to_start = 500
-    lookback = 500
+    index_to_start = 600
+    lookback = 600
     weight_recent_data= 1 # "weight to recent patterns"
     Weight_type_in_lags = 'triangle'  # 'triangle' or 'equal'
-    fringe_weight_if_triangle = 0.09  # only used if Weight_type_in_lags == 'triangle'
+    fringe_weight_if_triangle = 0.05  # only used if Weight_type_in_lags == 'triangle'
+
+    #Sometimes some parameters might result in errors.
 
     ###########################
 
-    final_prediction = get_final_prediction(data_storage, meta_data, index_to_start, lookback, weight_recent_data, Weight_type_in_lags, fringe_weight_if_triangle)
-    print(final_prediction)
+
+
+    #1--- Get Predictions for one increment ahead!
+    all_final_predictions, prediction_lags_length = get_final_prediction(data_storage, meta_data, index_to_start, lookback, weight_recent_data, Weight_type_in_lags, fringe_weight_if_triangle)
+
+    #Get Recent lagged pattern and output prediction
+    lagged_pattern = "".join(map(str, Direction_list[-prediction_lags_length:]))
+    next_increment_prediction = all_final_predictions[lagged_pattern]
+    
+    print(next_increment_prediction)
 
 
     

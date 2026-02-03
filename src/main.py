@@ -12,10 +12,12 @@ def main():
 
     data = data_storage.get_data()
 
-    print(data)
+    #print(data)
 
     
-    #data = slice_data = data_storage.slice_data(data, lookback=90, index_to_start=500)
+    slice_data = data_storage.slice_data(data, lookback=50, index_to_start=100)
+    print(slice_data)
+    print(slice_data["Direction"])
    
     #updated_slice = data_storage.update_weights_splitting_on_slice(slice_data, 9)
 
@@ -23,7 +25,7 @@ def main():
 
 
     #----old code---
-    direction_list = data["Direction"]
+    direction_list = slice_data["Direction"]
 
     window = Sliding_window(direction_list, 1, 0)
     tree = Pettern_tree_map()

@@ -18,18 +18,20 @@ class Data_Storage:
         return self.data
     
     def slice_data(self,data, lookback, index_to_start):
-        window_error = index_to_start - lookback + 1
+        window_error = index_to_start - lookback 
         if window_error < 0:
-            print(f"Warning: window error {abs(window_error)} < 0")
-            print(f"Increase index or decrease lookback by: {window_error}")
+            print()
+            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            print(f"Warning: window error: {window_error} < 0")
+            print(f"Increase index or decrease lookback by: {abs(window_error)}")
+            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            print()
         else:   
 
-            start_index = index_to_start + 1
-            end_index = index_to_start - lookback + 1
-            data = data.iloc[start_index:end_index]
-            print(f"Data sliced from index {start_index} to {end_index}"
-                  )
-            print(data)
+            head_index = index_to_start 
+            tail_index = index_to_start - lookback 
+            data = data.iloc[tail_index:head_index]
+            print(f"Data sliced from index {tail_index} to {head_index}")
             return data
 
     # Main functions

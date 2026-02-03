@@ -7,11 +7,18 @@ import numpy as np
 from Weighted_Average import calculate_weighted_averages, weights_to_average
 
 def main():
-    data_storage = Data_Storage('TSLA', '2020-01-01', '2023-01-01', 1)
+    data_storage = Data_Storage('TSLA', '2020-01-01', '2023-01-01')
     
 
     data = data_storage.get_data()
-    direction_list = data["Direction"]
+
+    
+    slice_data = data.iloc[0:100]
+    print(slice_data)
+    updated_slice = data_storage.update_weights_splitting_on_slice(slice_data, 9)
+
+    print(updated_slice)
+    direction_list = updated_slice["Direction"]
 
     window = Sliding_window(direction_list, 1, 0)
     tree = Pettern_tree_map()

@@ -6,7 +6,7 @@ from pattern_tree.Pattern_tree_map import Pettern_tree_map
 
 #LATER WE CAN PUT THIS IN A CLASS
 
-def populate_tree(weight_updated_slice):
+def populate_tree_predictions(weight_updated_slice):
 
     "---Populate Pattern Tree--- Get predictions of each pattern"
 

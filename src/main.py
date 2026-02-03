@@ -1,20 +1,20 @@
 from Data_Storage import Data_Storage
-from pattern_tree.Populate_Tree import populate_tree
+from pattern_tree.Populate_Tree_Predictions import populate_tree_predictions
 from Weighted_Average import calculate_weighted_averages, weights_to_average
 
 def main():
     data_storage = Data_Storage('TSLA', '2020-01-01', '2023-01-01')
-    
-
     meta_data = data_storage.get_data()
 
+    ####### PARAMETERS #######
 
-    lookback = 100
-    index_to_start = 100
-    weight_recent_data= 20 # "We want to give more weight to recent patterns"
-    Weight_type_in_lags = 'equal'  # 'triangle' or 'equal'
+    index_to_start = 500
+    lookback = 500
+    weight_recent_data= 1 # "weight to recent patterns"
+    Weight_type_in_lags = 'triangle'  # 'triangle' or 'equal'
     fringe_weight_if_triangle = 0.09  # only used if Weight_type_in_lags == 'triangle'
-    
+
+    ###########################
 
   
     #1---Get Data Slice and Update Weights---
@@ -23,7 +23,7 @@ def main():
     
 
     #2---Populate Pattern Tree--- Get predictions of each pattern
-    tree, prediction_lags_length = populate_tree(weight_updated_slice)
+    tree, prediction_lags_length = populate_tree_predictions(weight_updated_slice)
 
     #3---Weights for Weighted Average---
     Weight_object = weights_to_average(prediction_lags_length)

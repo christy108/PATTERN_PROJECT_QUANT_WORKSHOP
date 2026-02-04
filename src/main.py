@@ -4,7 +4,7 @@ from Evaluate_Strategy import Evaluate_Strategy
 
 
 def main():
-    ticker = 'GC=F'
+    ticker = 'AAPL'
     start_date = '2015-01-01'
     end_date = '2023-01-01'
     data_storage = Data_Storage(ticker,start_date , end_date)
@@ -29,7 +29,8 @@ def main():
     #Sometimes some parameters might result in errors.
 
     ######Trading Logic Parameters######
-    #this might be asset specific, some are less volatile and have lower er
+
+    #this is asset specific, some are less volatile and have lower return
     expected_return_trade_threshold = 0.001
     predicted_probs_trade_threshold = 0.50
     transaction_costs = 0.0001

@@ -15,7 +15,7 @@ def main():
 
     index_to_start = 300
     lookback = 300
-    weight_recent_data= 5 # "weight to recent patterns"
+    weight_recent_data= 10 # "weight to recent patterns"
     Weight_type_in_lags = 'triangle'  # 'triangle' or 'equal'
     #Weight_type_in_lags = "equal"
     fringe_weight_if_triangle = 0.05  # only used if Weight_type_in_lags == 'triangle'
@@ -39,8 +39,8 @@ def main():
     all_strategy_returns = []
 
     #######Strategy Parameters######
-    expected_return_trade_threshold = 0.01
-    predicted_probs_trade_threshold = 0.55
+    expected_return_trade_threshold = 0.005
+    predicted_probs_trade_threshold = 0.51
     transaction_costs = 0.0001
 
     ################################

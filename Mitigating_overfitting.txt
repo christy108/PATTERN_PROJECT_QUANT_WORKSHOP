@@ -1,0 +1,8 @@
+
+
+1- Stopping the lagged pattern lenght when when 2^pattern lenght is more than the number of patterns.
+2- Filter outlier returns, so the average isnt skewed.
+3- Lookback window, adjusting probabilities, dosent train on all past data 
+4- Weight recent data, model adjusts.
+5- Lower the weights for longer patterns and shorter patterns.
+6- Its a relatively simple model.

@@ -8,6 +8,7 @@ def get_final_prediction(data_storage, meta_data, index_to_start, lookback, weig
     #1---Get Data Slice and Update Weights---
     slice_data = data_storage.slice_data(meta_data, lookback=lookback, index_to_start=index_to_start)
     weight_updated_slice = data_storage.update_weights_splitting_on_slice(slice_data, weight_recent_data)
+    direction_list = slice_data["Direction"]
 
 
     #2---Populate Pattern Tree--- Get predictions of each pattern
@@ -25,4 +26,4 @@ def get_final_prediction(data_storage, meta_data, index_to_start, lookback, weig
 
     #4---Average Expected Return and Probability of Rising pattern based on weights---
     final_prediction = calculate_weighted_averages(prediction_lags_length, tree, Weight_Probs)
-    return final_prediction, prediction_lags_length
+    return final_prediction, prediction_lags_length, direction_list

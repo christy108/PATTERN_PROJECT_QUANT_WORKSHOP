@@ -1,6 +1,8 @@
 from Data_Storage import Data_Storage
 from Final_Prediction_slow import get_final_prediction #Write efficient version later
 from Evaluate_Strategy import Evaluate_Strategy
+
+
 def main():
     data_storage = Data_Storage('TSLA', '2020-01-01', '2023-01-01')
     meta_data = data_storage.get_data()
@@ -11,10 +13,11 @@ def main():
 
 
 
-    ####### PARAMETERS #######
+    ####### Model Parameters #######
 
     index_to_start = 300
-    lookback = 300
+    index_to_stop = 400 # meta_data.shape[0] - 2 #2??
+    lookback = 100
     weight_recent_data= 5 # "weight to recent patterns"
     Weight_type_in_lags = 'triangle'  # 'triangle' or 'equal'
     #Weight_type_in_lags = "equal"
@@ -22,8 +25,11 @@ def main():
 
     #Sometimes some parameters might result in errors.
 
-    ###########################
-
+    ######Trading Logic Parameters######
+    expected_return_trade_threshold = 0.01
+    predicted_probs_trade_threshold = 0.55
+    transaction_costs = 0.0001
+    ################################
 
 
     # #1--- Get Predictions for one increment ahead!
@@ -38,15 +44,9 @@ def main():
     strategy_returns_in_trades_only = []
     all_strategy_returns = []
 
-    #######Strategy Parameters######
-    expected_return_trade_threshold = 0.01
-    predicted_probs_trade_threshold = 0.55
-    transaction_costs = 0.0001
-
-    ################################
 
     #1--- Itterate through timeseries
-    for i in range(index_to_start, meta_data.shape[0] - 2): #2??
+    for i in range(index_to_start, index_to_stop): 
 
         current_head_index_of_window = i
 
@@ -98,7 +98,20 @@ def main():
     Evalaute.get_cumulative_returns_in_trades_only()
     Evalaute.get_cumulative_returns_all_strategy()
 
-    Evalaute.plot_strategy_returns_in_trades_only()
+
+    strategy_params = {
+    "index_to_start": index_to_start,
+    "index_to_stop": index_to_stop,
+    "lookback": lookback,
+    "weight_recent": weight_recent_data,
+    "weight_type": Weight_type_in_lags,
+    "fringe_weight": fringe_weight_if_triangle,
+    "ret_threshold": expected_return_trade_threshold,
+    "prob_threshold": predicted_probs_trade_threshold,
+    "trans_costs": transaction_costs,
+    "total_trades": len(strategy_returns_in_trades_only) # Useful extra info
+}
+    Evalaute.plot_strategy_returns_in_trades_only_with_parameters(strategy_params)
 
     # print(strategy_returns_in_trades_only)
     # print(all_strategy_returns)

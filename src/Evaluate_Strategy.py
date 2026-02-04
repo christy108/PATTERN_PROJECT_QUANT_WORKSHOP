@@ -60,4 +60,50 @@ class Evaluate_Strategy:
         
         # Save the figure
         #plt.savefig('strategy_returns_plot.png')
+
+
+    def plot_strategy_returns_in_trades_only_with_parameters(self, params_dict, title="Cumulative Strategy Returns per Trade"):
+        """
+        Plots the cumulative returns with a dynamic parameter box.
+        
+        Args:
+            params_dict (dict): Dictionary containing the parameter names and values.
+            title (str): Title of the plot.
+        """
+        # 1. Fetch data
+        get_cumulative_returns_in_trades_only = self.get_cumulative_returns_in_trades_only()
+        
+        plt.figure(figsize=(12, 7))
+        
+        # 2. Plotting logic
+        plt.plot(get_cumulative_returns_in_trades_only.index, 
+                get_cumulative_returns_in_trades_only.values, 
+                label='Cumulative Returns', color='blue', linewidth=2)
+        
+        plt.fill_between(get_cumulative_returns_in_trades_only.index, 
+                        get_cumulative_returns_in_trades_only.values, 
+                        alpha=0.2, color='blue')
+        
+        plt.axhline(0, color='black', linestyle='--', linewidth=1)
+
+        # 3. Construct params_info string dynamically from the input dictionary
+        # This loop formats each key-value pair and joins them with newlines
+        params_str = "\n".join([f"{k}: {v}" for k, v in params_dict.items()])
+
+        # 4. Add the text box (Legend-style)
+        # Using 'monospace' ensures the colons align if keys are similar lengths
+        props = dict(boxstyle='round', facecolor='white', alpha=0.8, edgecolor='gray')
+        
+        plt.gca().text(0.02, 0.95, params_str, transform=plt.gca().transAxes, 
+                    fontsize=9, verticalalignment='top', bbox=props, family='monospace')
+
+        # 5. Final Styling
+        plt.title(title, fontsize=14, fontweight='bold')
+        plt.xlabel('Trade Index / Time', fontsize=12)
+        plt.ylabel('Cumulative Return', fontsize=12)
+        plt.grid(True, which='both', linestyle='--', alpha=0.5)
+        plt.legend(loc='upper right')
+        
+        plt.tight_layout()
+        plt.show()
         

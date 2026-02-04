@@ -99,11 +99,11 @@ class Evaluate_Strategy:
 
         # 5. Final Styling
         plt.title(title, fontsize=14, fontweight='bold')
-        plt.xlabel('Trade Index / Time', fontsize=12)
+        plt.xlabel('Trade Number', fontsize=12)
         plt.ylabel('Cumulative Return', fontsize=12)
         plt.grid(True, which='both', linestyle='--', alpha=0.5)
         plt.legend(loc='upper right')
         
         plt.tight_layout()
         plt.show()
-        
+        #plt.savefig()

@@ -4,7 +4,10 @@ from Evaluate_Strategy import Evaluate_Strategy
 
 
 def main():
-    data_storage = Data_Storage('TSLA', '2020-01-01', '2023-01-01')
+    ticker = 'GC=F'
+    start_date = '2015-01-01'
+    end_date = '2023-01-01'
+    data_storage = Data_Storage(ticker,start_date , end_date)
     meta_data = data_storage.get_data()
     #meta_direction_list = meta_data['Direction']
     
@@ -16,9 +19,9 @@ def main():
     ####### Model Parameters #######
 
     index_to_start = 300
-    index_to_stop = 400 # meta_data.shape[0] - 2 #2??
-    lookback = 100
-    weight_recent_data= 5 # "weight to recent patterns"
+    index_to_stop =  meta_data.shape[0] - 2 #2??
+    lookback = 300
+    weight_recent_data= 3 # "weight to recent patterns"
     Weight_type_in_lags = 'triangle'  # 'triangle' or 'equal'
     #Weight_type_in_lags = "equal"
     fringe_weight_if_triangle = 0.05  # only used if Weight_type_in_lags == 'triangle'
@@ -26,8 +29,9 @@ def main():
     #Sometimes some parameters might result in errors.
 
     ######Trading Logic Parameters######
-    expected_return_trade_threshold = 0.01
-    predicted_probs_trade_threshold = 0.55
+    #this might be asset specific, some are less volatile and have lower er
+    expected_return_trade_threshold = 0.001
+    predicted_probs_trade_threshold = 0.50
     transaction_costs = 0.0001
     ################################
 
@@ -63,7 +67,7 @@ def main():
         next_increment_index = current_head_index_of_window + 1
         actual_return = meta_data["Returns"].iloc[next_increment_index]
 
-        print(lagged_pattern_at_head, predicted_return, predicted_probs,actual_return, current_head_index_of_window, "of",meta_data.shape[0] - 2 )
+        print(lagged_pattern_at_head, predicted_return, predicted_probs,actual_return, current_head_index_of_window, "of",index_to_stop )
         
 
 
@@ -100,8 +104,9 @@ def main():
 
 
     strategy_params = {
-    "index_to_start": index_to_start,
-    "index_to_stop": index_to_stop,
+    "asset": ticker,
+    "date_start_end": [start_date, end_date],
+    "index_start_end": [index_to_start,index_to_stop],
     "lookback": lookback,
     "weight_recent": weight_recent_data,
     "weight_type": Weight_type_in_lags,

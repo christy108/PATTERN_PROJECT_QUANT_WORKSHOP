@@ -1,4 +1,4 @@
-from pattern_tree.populate_tree_predictions import populate_tree_predictions
+from pattern_tree.populate_tree_predictions import populate_tree_predictions, populate_tree_predictions_fast_version
 from Weighted_Average import calculate_weighted_averages, weights_to_average
 
 
@@ -12,7 +12,7 @@ def get_final_prediction(data_storage, meta_data, index_to_start, lookback, weig
 
 
     #2---Populate Pattern Tree--- Get predictions of each pattern
-    tree, prediction_lags_length = populate_tree_predictions(weight_updated_slice)
+    tree, prediction_lags_length = populate_tree_predictions_fast_version(weight_updated_slice)
 
     #3---Weights for Weighted Average---
     Weight_object = weights_to_average(prediction_lags_length)

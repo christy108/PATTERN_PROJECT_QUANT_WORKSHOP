@@ -13,13 +13,13 @@ def main():
 
     ####### Model Parameters #######
 
-    index_to_start = 300
-    index_to_stop =  meta_data.shape[0] - 2 #2??
-    lookback = 300
+    index_to_start = 402
+    index_to_stop =  500#meta_data.shape[0] - 2 #2??
+    lookback = 102
 
     weight_recent_data= 3 # "weight to recent patterns" # Optimal is around 3 for 300 lookback
 
-    Weight_type_in_lags = 'equal'  # 'triangle' or 'equal'
+    Weight_type_in_lags = 'triangle'  # 'triangle' or 'equal'
     #Weight_type_in_lags = "equal"
     fringe_weight_if_triangle = 0.05  # only used if Weight_type_in_lags == 'triangle'
 

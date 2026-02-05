@@ -1,0 +1,2 @@
+1- Weight recent data = 3
+2- Prob rising = 0.5

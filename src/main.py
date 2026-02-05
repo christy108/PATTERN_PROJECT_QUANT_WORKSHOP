@@ -9,13 +9,6 @@ def main():
     end_date = '2020-01-01'
     data_storage = Data_Storage(ticker,start_date , end_date)
     meta_data = data_storage.get_data()
-    #meta_direction_list = meta_data['Direction']
-
-    
-    
-
-    
-
 
 
     ####### Model Parameters #######
@@ -24,10 +17,9 @@ def main():
     index_to_stop =  meta_data.shape[0] - 2 #2??
     lookback = 300
 
-    #This might be alittle dogey
     weight_recent_data= 3 # "weight to recent patterns" # Optimal is around 3 for 300 lookback
 
-    Weight_type_in_lags = 'triangle'  # 'triangle' or 'equal'
+    Weight_type_in_lags = 'equal'  # 'triangle' or 'equal'
     #Weight_type_in_lags = "equal"
     fringe_weight_if_triangle = 0.05  # only used if Weight_type_in_lags == 'triangle'
 
@@ -37,7 +29,7 @@ def main():
 
     #this is asset specific, some are less volatile and have lower return
     expected_return_trade_threshold = 0.001
-    predicted_probs_trade_threshold = 0
+    predicted_probs_trade_threshold = 0.5    #0.5 good with 
     transaction_costs = 0.0001
     ################################
 
@@ -90,7 +82,7 @@ def main():
             
             strategy_returns_in_trades_only.append(net_long_actual_return)
             all_strategy_returns.append(net_long_actual_return)
-            print("L")
+            print("Long")
         
         #Short
         elif predicted_return < -expected_return_trade_threshold and predicted_probs < (1 - predicted_probs_trade_threshold):
@@ -99,7 +91,7 @@ def main():
             net_short_actual_return = -actual_return - transaction_costs
             strategy_returns_in_trades_only.append(net_short_actual_return)
             all_strategy_returns.append(net_short_actual_return)
-            print("S")
+            print("Short")
         
         #Dont Trade
         else:
@@ -107,8 +99,14 @@ def main():
             all_strategy_returns.append(0)
     
     Evalaute = Evaluate_Strategy(strategy_returns_in_trades_only, all_strategy_returns)
-    Evalaute.get_cumulative_returns_in_trades_only()
-    Evalaute.get_cumulative_returns_all_strategy()
+    # Evalaute.get_cumulative_returns_in_trades_only()
+
+    # Evalaute.get_cumulative_returns_all_strategy()
+
+    #Evalaute.get_sharpe_ratio_all_strategy
+
+    Sharpe_in_trade = Evalaute.get_sharpe_ratio_in_trade_only()
+
 
 
     strategy_params = {
@@ -122,7 +120,8 @@ def main():
     "ret_threshold": expected_return_trade_threshold,
     "prob_threshold": predicted_probs_trade_threshold,
     "trans_costs": transaction_costs,
-    "total_trades": len(strategy_returns_in_trades_only) # Useful extra info
+    "total_trades": len(strategy_returns_in_trades_only), # Useful extra info
+    "Sharpe Ratio": Sharpe_in_trade
 }
     Evalaute.plot_strategy_returns_in_trades_only_with_parameters(strategy_params)
 

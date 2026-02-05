@@ -10,6 +10,8 @@ def main():
     data_storage = Data_Storage(ticker,start_date , end_date)
     meta_data = data_storage.get_data()
     #meta_direction_list = meta_data['Direction']
+
+    
     
 
     
@@ -20,8 +22,8 @@ def main():
 
     index_to_start = 300
     index_to_stop =  meta_data.shape[0] - 2 #2??
-    lookback = 300
-    weight_recent_data= 3 # "weight to recent patterns"
+    lookback = 200
+    weight_recent_data= 10 # "weight to recent patterns"
     Weight_type_in_lags = 'triangle'  # 'triangle' or 'equal'
     #Weight_type_in_lags = "equal"
     fringe_weight_if_triangle = 0.05  # only used if Weight_type_in_lags == 'triangle'

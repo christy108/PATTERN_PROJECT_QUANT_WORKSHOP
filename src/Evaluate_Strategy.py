@@ -14,12 +14,12 @@ class Evaluate_Strategy:
     def get_cumulative_returns_in_trades_only(self):
         cum_ret = (1 + self.strategy_returns_in_trades_only).cumprod() - 1
 
-        return cum_ret
+        return cum_ret*100
 
     
     def get_cumulative_returns_all_strategy(self):
         cum_ret = (1 + self.all_strategy_returns).cumprod() - 1
-        return cum_ret
+        return cum_ret*100
 
 
 

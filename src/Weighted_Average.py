@@ -75,7 +75,7 @@ def get_binary_patterns_at_lenght(length):
 
 def calculate_weighted_averages(pattern_lenght, tree, weights):
         "Calculates the weighted average expected return and probability of rising for given past patterns.                                                                                                                  "
-        
+        "Basically applies the equal or triangle weights to the predictions at different lenghts"
         
        
         final_prediction = {}

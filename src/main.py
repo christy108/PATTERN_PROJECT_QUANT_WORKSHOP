@@ -4,9 +4,9 @@ from Evaluate_Strategy import Evaluate_Strategy
 
 
 def main():
-    ticker = 'AAPL'
+    ticker = 'ES=F'
     start_date = '2015-01-01'
-    end_date = '2023-01-01'
+    end_date = '2020-01-01'
     data_storage = Data_Storage(ticker,start_date , end_date)
     meta_data = data_storage.get_data()
     #meta_direction_list = meta_data['Direction']
@@ -22,8 +22,11 @@ def main():
 
     index_to_start = 300
     index_to_stop =  meta_data.shape[0] - 2 #2??
-    lookback = 200
-    weight_recent_data= 10 # "weight to recent patterns"
+    lookback = 300
+
+    #This might be alittle dogey
+    weight_recent_data= 3 # "weight to recent patterns" # Optimal is around 3 for 300 lookback
+
     Weight_type_in_lags = 'triangle'  # 'triangle' or 'equal'
     #Weight_type_in_lags = "equal"
     fringe_weight_if_triangle = 0.05  # only used if Weight_type_in_lags == 'triangle'
@@ -34,7 +37,7 @@ def main():
 
     #this is asset specific, some are less volatile and have lower return
     expected_return_trade_threshold = 0.001
-    predicted_probs_trade_threshold = 0.50
+    predicted_probs_trade_threshold = 0
     transaction_costs = 0.0001
     ################################
 
@@ -87,6 +90,7 @@ def main():
             
             strategy_returns_in_trades_only.append(net_long_actual_return)
             all_strategy_returns.append(net_long_actual_return)
+            print("L")
         
         #Short
         elif predicted_return < -expected_return_trade_threshold and predicted_probs < (1 - predicted_probs_trade_threshold):
@@ -95,6 +99,7 @@ def main():
             net_short_actual_return = -actual_return - transaction_costs
             strategy_returns_in_trades_only.append(net_short_actual_return)
             all_strategy_returns.append(net_short_actual_return)
+            print("S")
         
         #Dont Trade
         else:

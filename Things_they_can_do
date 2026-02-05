@@ -1,6 +1,6 @@
 
 
-1- PLot the predictions
+
 2- Come up with a function for betsize mixing kelly criterion and predictied volatility.
 3- Evaluate strategy under different parameters
 4- Understand how we can avoid overfitting with those parameters.

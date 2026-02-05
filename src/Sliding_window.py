@@ -12,7 +12,7 @@ class Sliding_window:
             i += self.index_of_window
             if i >= len(self.direction_list):
                 break
-            self.increments.append(self.direction_list.iloc[i])
+            self.increments.append(self.direction_list[i])
 
     def get_increments(self):
         return self.increments

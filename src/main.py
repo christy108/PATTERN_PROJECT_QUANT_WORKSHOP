@@ -4,7 +4,7 @@ from Evaluate_Strategy import Evaluate_Strategy
 
 
 def main():
-    ticker = 'ES=F'
+    ticker = "^GSPC" #"ES=F"
     start_date = '2015-01-01'
     end_date = '2025-01-01'
     data_storage = Data_Storage(ticker,start_date , end_date)

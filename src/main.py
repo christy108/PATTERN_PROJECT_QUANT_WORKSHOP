@@ -6,16 +6,17 @@ from Evaluate_Strategy import Evaluate_Strategy
 def main():
     ticker = 'ES=F'
     start_date = '2015-01-01'
-    end_date = '2020-01-01'
+    end_date = '2025-01-01'
     data_storage = Data_Storage(ticker,start_date , end_date)
     meta_data = data_storage.get_data()
+    all_returns = meta_data["Returns"].to_numpy()
 
 
     ####### Model Parameters #######
 
-    index_to_start = 600
+    index_to_start = 300
     index_to_stop =  meta_data.shape[0] - 2 #2??
-    lookback = 600
+    lookback = 300
 
     weight_recent_data= 3 # "weight to recent patterns" # Optimal is around 3 for 300 lookback
 
@@ -29,7 +30,7 @@ def main():
 
     #this is asset specific, some are less volatile and have lower return
     expected_return_trade_threshold = 0.001
-    predicted_probs_trade_threshold = 0.5    #0.5 good with 
+    predicted_probs_trade_threshold = 0.50    #0.5 good with 
     transaction_costs = 0.0001
     ################################
 
@@ -63,7 +64,7 @@ def main():
         predicted_probs = next_increment_prediction["average_probability_of_rising"]
 
         next_increment_index = current_head_index_of_window + 1
-        actual_return = meta_data["Returns"].iloc[next_increment_index]
+        actual_return = all_returns[next_increment_index]
 
         print(lagged_pattern_at_head, predicted_return, predicted_probs,actual_return, current_head_index_of_window, "of",index_to_stop )
         
@@ -98,7 +99,10 @@ def main():
             #We dont trade, so returns are 0
             all_strategy_returns.append(0)
     
-    Evalaute = Evaluate_Strategy(strategy_returns_in_trades_only, all_strategy_returns)
+    # Slice the array from where you started trading to where you stopped
+    oringinal_asset_returns = all_returns[index_to_start + 1 : index_to_stop + 1]
+
+    Evalaute = Evaluate_Strategy(oringinal_asset_returns,strategy_returns_in_trades_only, all_strategy_returns)
     # Evalaute.get_cumulative_returns_in_trades_only()
 
     # Evalaute.get_cumulative_returns_all_strategy()
@@ -106,6 +110,7 @@ def main():
     #Evalaute.get_sharpe_ratio_all_strategy
 
     Sharpe_in_trade = Evalaute.get_sharpe_ratio_in_trade_only()
+    Sharpe_whole_asset = Evalaute.get_sharpe_ratio_original_asset()
 
 
 
@@ -124,6 +129,8 @@ def main():
     "Sharpe Ratio": Sharpe_in_trade
 }
     Evalaute.plot_strategy_returns_in_trades_only_with_parameters(strategy_params)
+    Evalaute.plot_strategy_returns_all_strategy_with_parameters(strategy_params)
+    Evalaute.plot_original_asset_returns_with_parameters(Sharpe_whole_asset)
 
     # print(strategy_returns_in_trades_only)
     # print(all_strategy_returns)

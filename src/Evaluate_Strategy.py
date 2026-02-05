@@ -2,13 +2,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+
+
 class Evaluate_Strategy:
 
     
     #Can add date too for plotting
-    def __init__(self, strategy_returns_in_trades_only, all_strategy_returns):
+    def __init__(self, asset_returns, strategy_returns_in_trades_only, all_strategy_returns):
         self.strategy_returns_in_trades_only = pd.Series(strategy_returns_in_trades_only)
         self.all_strategy_returns = pd.Series(all_strategy_returns)
+        self.asset_returns = pd.Series(asset_returns)
         
     
 
@@ -22,15 +25,15 @@ class Evaluate_Strategy:
         cum_ret = (1 + self.all_strategy_returns).cumprod() - 1
         return cum_ret*100
     
+    def get_cumulative_return_original_asset(self):
+        cum_ret = (1+ self.asset_returns).cumprod() - 1
+        return cum_ret*100
+    
 
     def get_sharpe_ratio_in_trade_only(self):
         """
         Calculates the annualized Sharpe Ratio from daily returns.
-        
-        Parameters:
-        daily_returns (array-like): Array of daily return percentages.
-        risk_free_rate (float): Annual risk-free rate (e.g., 0.04 for 4%).
-        trading_days (int): Number of trading days in a year (default is 252).
+
         """
 
         risk_free_rate=0
@@ -59,13 +62,7 @@ class Evaluate_Strategy:
     def get_sharpe_ratio_all_strategy(self):
         """
         Calculates the annualized Sharpe Ratio from daily returns.
-        
-        Parameters:
-        daily_returns (array-like): Array of daily return percentages.
-        risk_free_rate (float): Annual risk-free rate (e.g., 0.04 for 4%).
-        trading_days (int): Number of trading days in a year (default is 252).
         """
-
         risk_free_rate=0
         trading_days=252
 
@@ -86,6 +83,32 @@ class Evaluate_Strategy:
         annualized_sharpe = daily_sharpe * np.sqrt(trading_days)
         
         return annualized_sharpe
+    
+    def get_sharpe_ratio_original_asset(self):
+        """
+        Calculates the annualized Sharpe Ratio for the original underlying asset.
+        """
+        risk_free_rate = 0
+        trading_days = 252
+
+        # Convert annual risk-free rate to daily
+        daily_rf = (1 + risk_free_rate) ** (1 / trading_days) - 1
+        
+        # Calculate excess returns
+        excess_returns = self.asset_returns - daily_rf
+        
+        # Calculate stats using NumPy for speed
+        mean_excess_return = np.mean(excess_returns)
+        std_dev_returns = np.std(excess_returns)
+        
+        # Avoid division by zero if asset had no volatility
+        if std_dev_returns == 0:
+            return 0
+            
+        daily_sharpe = mean_excess_return / std_dev_returns
+        
+        # Annualize
+        return daily_sharpe * np.sqrt(trading_days)
 
 
 
@@ -223,3 +246,48 @@ class Evaluate_Strategy:
         plt.tight_layout()
         plt.show()
         #plt.savefig()
+
+
+    
+    def plot_original_asset_returns_with_parameters(self, sharpe_ratio, title="Cumulative Asset Returns"):
+        """
+        Plots the cumulative returns with only the Sharpe Ratio in the legend.
+        
+        Args:
+            sharpe_ratio (float/str): The calculated Sharpe Ratio value.
+            title (str): Title of the plot.
+        """
+        # 1. Fetch data
+        get_cumulative_returns = self.get_cumulative_return_original_asset()
+        
+        # 2. Format the label for the legend
+        # If it's a number, format to 4 decimal places; if not, just use the string.
+        if isinstance(sharpe_ratio, (int, float)):
+            label_text = f'Cumulative Returns (Sharpe: {sharpe_ratio:.4f})'
+        else:
+            label_text = f'Cumulative Returns (Sharpe: {sharpe_ratio})'
+        
+        plt.figure(figsize=(12, 7))
+        
+        # 3. Plotting logic
+        plt.plot(get_cumulative_returns.index, 
+                get_cumulative_returns.values, 
+                label=label_text, color='blue', linewidth=2)
+        
+        plt.fill_between(get_cumulative_returns.index, 
+                        get_cumulative_returns.values, 
+                        alpha=0.2, color='blue')
+        
+        plt.axhline(0, color='black', linestyle='--', linewidth=1)
+
+        # 4. Styling
+        plt.title(title, fontsize=14, fontweight='bold')
+        plt.xlabel('Trade Number', fontsize=12)
+        plt.ylabel('Cumulative Return (%)', fontsize=12)
+        plt.grid(True, which='both', linestyle='--', alpha=0.5)
+        
+        # Legend will now only show the label defined in step 2
+        plt.legend(loc='upper left', fontsize=10)
+        
+        plt.tight_layout()
+        plt.show()

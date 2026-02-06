@@ -1,6 +1,7 @@
 from Data_Storage import Data_Storage
 from Final_Prediction_slow import get_final_prediction #Write efficient version later
 from Evaluate_Strategy import Evaluate_Strategy
+from BetSizing import get_bet_size
 
 
 def main():
@@ -70,7 +71,14 @@ def main():
         
 
 
+        # --- Bet sizing ---
+        bet_size = get_bet_size(
+            predicted_probability=predicted_probs,
+            predicted_volatility=predicted_vol,     # must be defined earlier
+            reference_volatility=long_run_vol        # rolling or fixed
+        )
 
+        
 
         #3----Trade Logic
 
@@ -79,20 +87,32 @@ def main():
         #Long
         if predicted_return > expected_return_trade_threshold and predicted_probs > predicted_probs_trade_threshold:
             
-            net_long_actual_return = actual_return - transaction_costs
-            
+            if predicted_return > expected_return_trade_threshold and predicted_probs > predicted_probs_trade_threshold:
+
+                net_long_actual_return = (
+                        bet_size * actual_return - transaction_costs
+                )
+
             strategy_returns_in_trades_only.append(net_long_actual_return)
             all_strategy_returns.append(net_long_actual_return)
-            print("Long")
+            print("Long | Bet size:", bet_size)
+
         
         #Short
         elif predicted_return < -expected_return_trade_threshold and predicted_probs < (1 - predicted_probs_trade_threshold):
             
             #We short thus -
-            net_short_actual_return = -actual_return - transaction_costs
+
+            elif predicted_return < -expected_return_trade_threshold and predicted_probs < (1 - predicted_probs_trade_threshold):
+
+                net_short_actual_return = (
+                    -bet_size * actual_return - transaction_costs
+                )
+
             strategy_returns_in_trades_only.append(net_short_actual_return)
             all_strategy_returns.append(net_short_actual_return)
-            print("Short")
+            print("Short | Bet size:", bet_size)
+
         
         #Dont Trade
         else:

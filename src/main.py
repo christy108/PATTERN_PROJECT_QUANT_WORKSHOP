@@ -1,3 +1,4 @@
+import numpy as np
 from Data_Storage import Data_Storage
 from Final_Prediction_slow import get_final_prediction #Write efficient version later
 from Evaluate_Strategy import Evaluate_Strategy
@@ -25,6 +26,11 @@ def main():
     #Weight_type_in_lags = "equal"
     fringe_weight_if_triangle = 0.05  # only used if Weight_type_in_lags == 'triangle'
 
+    # --- Volatility parameters ---
+    short_vol_window = 30     # recent volatility window
+    long_vol_window = 252     # long-term volatility window
+
+    
     #Sometimes some parameters might result in errors.
 
     ######Trading Logic Parameters######
@@ -49,7 +55,7 @@ def main():
     all_strategy_returns = []
 
 
-    #1--- Itterate through timeseries
+    #1--- Iterate through time series
     for i in range(index_to_start, index_to_stop): 
 
         current_head_index_of_window = i
@@ -70,6 +76,15 @@ def main():
         print(lagged_pattern_at_head, predicted_return, predicted_probs,actual_return, current_head_index_of_window, "of",index_to_stop )
         
 
+        # --- Volatility estimation (causal, no lookahead) ---
+        recent_returns = all_returns[max(0, i - short_vol_window): i]
+        long_returns   = all_returns[max(0, i - long_vol_window): i]
+        # Guard against early indices
+        if len(recent_returns) < 5 or len(long_returns) < 20:
+            all_strategy_returns.append(0)
+            continue
+        predicted_vol = np.std(recent_returns, ddof=1)
+        long_run_vol  = np.std(long_returns, ddof=1)
 
         # --- Bet sizing ---
         bet_size = get_bet_size(
@@ -86,32 +101,21 @@ def main():
 
         #Long
         if predicted_return > expected_return_trade_threshold and predicted_probs > predicted_probs_trade_threshold:
-            
-            if predicted_return > expected_return_trade_threshold and predicted_probs > predicted_probs_trade_threshold:
 
-                net_long_actual_return = (
-                        bet_size * actual_return - transaction_costs
-                )
+                net_long_actual_return = bet_size * actual_return - transaction_costs
 
-            strategy_returns_in_trades_only.append(net_long_actual_return)
-            all_strategy_returns.append(net_long_actual_return)
-            print("Long | Bet size:", bet_size)
-
+                strategy_returns_in_trades_only.append(net_long_actual_return)
+                all_strategy_returns.append(net_long_actual_return)
+                print("Long | Bet size:", bet_size)
         
         #Short
         elif predicted_return < -expected_return_trade_threshold and predicted_probs < (1 - predicted_probs_trade_threshold):
-            
-            #We short thus -
 
-            elif predicted_return < -expected_return_trade_threshold and predicted_probs < (1 - predicted_probs_trade_threshold):
+                net_short_actual_return = -bet_size * actual_return - transaction_costs
 
-                net_short_actual_return = (
-                    -bet_size * actual_return - transaction_costs
-                )
-
-            strategy_returns_in_trades_only.append(net_short_actual_return)
-            all_strategy_returns.append(net_short_actual_return)
-            print("Short | Bet size:", bet_size)
+                strategy_returns_in_trades_only.append(net_short_actual_return)
+                all_strategy_returns.append(net_short_actual_return)
+                print("Short | Bet size:", bet_size)
 
         
         #Dont Trade
@@ -158,8 +162,10 @@ def main():
 
     # print(strategy_returns_in_trades_only)
     # print(all_strategy_returns)
-   
 
+    # Volatility bet size sanity check
+    print(f"p={predicted_probs:.2f}, vol={predicted_vol:.4f}, "
+      f"long_vol={long_run_vol:.4f}, bet={bet_size:.4f}")
 
 
 

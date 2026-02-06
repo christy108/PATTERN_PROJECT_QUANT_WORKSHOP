@@ -98,6 +98,10 @@ def main():
         else:
             #We dont trade, so returns are 0
             all_strategy_returns.append(0)
+
+
+
+    #4---Evaluate Strategy
     
     # Slice the array from where you started trading to where you stopped
     oringinal_asset_returns = all_returns[index_to_start + 1 : index_to_stop + 1]

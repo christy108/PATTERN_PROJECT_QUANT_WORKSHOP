@@ -1,15 +1,25 @@
 from Data_Storage import Data_Storage
 from Final_Prediction_slow import get_final_prediction #Write efficient version later
 from Evaluate_Strategy import Evaluate_Strategy
+from latency.latency import latent_returns_validated, get_data_latency
 
 
 def main():
     ticker = "^GSPC" #"ES=F"
     start_date = '2015-01-01'
-    end_date = '2025-01-01'
-    data_storage = Data_Storage(ticker,start_date , end_date)
-    meta_data = data_storage.get_data()
+    end_date = '2026-02-07'
+    number_of_latency_hours = 0
+    num_years = 2
+    appply_latency = True
+    data_storage = Data_Storage(ticker, num_years, appply_latency, number_of_latency_hours)
+    meta_data= data_storage.get_data()
+    daily_data, hourly_data = get_data_latency(ticker, num_years = 2)
+    latent_returns = latent_returns_validated(number_of_latency_hours, daily_data, hourly_data)
+
+    print(latent_returns)
     
+
+    ####NOW ADD LATENT RETURNS TO THE END OF THE LIST, make sure they are the same year, 
     all_returns = meta_data["Returns"].to_numpy()
 
 

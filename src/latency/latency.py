@@ -61,22 +61,26 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 
-def get_data(ticker):
+def get_data_latency(ticker, num_years):
     # auto_adjust=False is non-negotiable for a perfect match
-    hourly = yf.download(ticker, period="2y", interval="1h", auto_adjust=False, progress=False)
-    daily = yf.download(ticker, period="2y", interval="1d", auto_adjust=False, progress=False)
     
+    daily = yf.download(ticker, period=f"{num_years}y", interval="1d", auto_adjust=False, progress=False)
+    
+    if num_years > 2:
+        hourly = yf.download(ticker, period="2y", interval="1h", auto_adjust=False, progress=False)
+
+    else:
+        hourly = yf.download(ticker, period=f"{num_years}y", interval="1h", auto_adjust=False, progress=False)
     # This fixes the 'u idiot' error by stripping the MultiIndex headers
     if isinstance(hourly.columns, pd.MultiIndex):
         hourly.columns = hourly.columns.get_level_values(0)
     if isinstance(daily.columns, pd.MultiIndex):
         daily.columns = daily.columns.get_level_values(0)
-        
     return hourly, daily
 
-def latent_returns_validated(number_of_latency_hours, ticker):
-    hourly_data, daily_data = get_data(ticker)
-    
+daily_data, hourly_data = get_data_latency("ES=F", 2)
+
+def latent_returns_validated(number_of_latency_hours, daily_data, hourly_data):
     # Create a clean mapping of Date -> Official Daily Close
     daily_close_map = daily_data['Close'].to_dict()
     daily_dates = sorted(daily_close_map.keys())
@@ -113,22 +117,22 @@ def latent_returns_validated(number_of_latency_hours, ticker):
 
 # --- VERIFICATION ---
 ticker = "ES=F"
-my_latent = latent_returns_validated(1, ticker)
+my_latent = latent_returns_validated(10, ticker)
 
-# Re-fetching daily returns and ensuring it's a Series to avoid the 'tolist' error
-daily_raw = yf.download(ticker, period="2y", interval="1d", auto_adjust=False, progress=False)
-if isinstance(daily_raw.columns, pd.MultiIndex):
-    daily_raw.columns = daily_raw.columns.get_level_values(0)
+# # Re-fetching daily returns and ensuring it's a Series to avoid the 'tolist' error
+# daily_raw = yf.download(ticker, period="2y", interval="1d", auto_adjust=False, progress=False)
+# if isinstance(daily_raw.columns, pd.MultiIndex):
+#     daily_raw.columns = daily_raw.columns.get_level_values(0)
 
-# .squeeze() converts a single-column DataFrame to a Series so .tolist() works
-official_daily = daily_raw['Close'].pct_change().dropna().squeeze().tolist()
+# # .squeeze() converts a single-column DataFrame to a Series so .tolist() works
+# official_daily = daily_raw['Close'].pct_change().dropna().squeeze().tolist()
 
-# Align lengths (Daily pct_change has 1 less row than the raw data)
-# We take the last N values to match the loop's output
-official_daily_aligned = official_daily[-len(my_latent):]
+# # Align lengths (Daily pct_change has 1 less row than the raw data)
+# # We take the last N values to match the loop's output
+# official_daily_aligned = official_daily[-len(my_latent):]
 
-diff = np.abs(np.array(my_latent) - np.array(official_daily_aligned))
-print(f"Max Difference: {np.max(diff):.15f}")
+# diff = np.abs(np.array(my_latent) - np.array(official_daily_aligned))
+# print(f"Max Difference: {np.max(diff):.15f}")
 
-if np.max(diff) < 1e-12:
-    print("SUCCESS: Latency 0 perfectly matches Daily returns.")
+# if np.max(diff) < 1e-12:
+#     print("SUCCESS: Latency 0 perfectly matches Daily returns.")

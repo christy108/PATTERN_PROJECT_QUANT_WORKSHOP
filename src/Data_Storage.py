@@ -1,32 +1,32 @@
 import yfinance as yf
 import numpy as np
-from latency.latency import latent_returns
+from latency.latency import apply_latency_hours_returns, get_hourly_data_latency   
 
 class Data_Storage:
-    def __init__(self, ticker, start_date, end_date):
+    def __init__(self, ticker, num_years, apply_latency, if_latency_how_much):
         self.ticker = ticker
-        self.start_date = start_date
-        self.end_date = end_date
-        self.data = yf.download(ticker, period="2y", interval="1d")
+        self.num_years = num_years
+        self.data = yf.download(ticker, period=f"{num_years}y", interval="1d", auto_adjust=False, progress=False)
 
         # Manipulating the data
 
-        #Only intraday
-        #self.data["Returns"] = (self.data['Close'] - self.data['Open']) / self.data['Open']
+        if apply_latency == False:
+            self.data["Returns"] = self.data['Close'].pct_change()
 
-
-        #Catches overnight jumps
-        self.data["Returns"] = self.data['Close'].pct_change()
-        self.data["Direction"] = np.where(self.data["Returns"] > 0, "1", "0")
-        self.data["weights"] = [1] * len(self.data)
-
+        
 
     # Utility functions
     def get_data(self):
-        
+        "Get data, hourly if latent"
+        if self.latency == True:
+            latency_data = get_hourly_data_latency(self.ticker)
+            latent_returns = apply_latency_hours_returns(latency_data, self.if_latency_how_much)
+            self.data["Returns"] = latent_returns
+        self.data["Direction"] = np.where(self.data["Returns"] > 0, "1", "0")
+        self.data["weights"] = [1] * len(self.data)
         return self.data
     
-    def slice_data(self,data, lookback, index_to_start):
+    def slice_data(self, data, lookback, index_to_start):
         window_error = index_to_start - lookback 
         if window_error < 0:
             print()

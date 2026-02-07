@@ -9,6 +9,11 @@ class Data_Storage:
         self.data = yf.download(self.ticker, start=self.start_date, end=self.end_date)
 
         # Manipulating the data
+
+        #Only intraday
+        self.data["Returns"] = (self.data['Close'] - self.data['Open']) / self.data['Open']
+
+        #Catches overnight jumps
         self.data["Returns"] = self.data['Close'].pct_change()
         self.data["Direction"] = np.where(self.data["Returns"] > 0, "1", "0")
         self.data["weights"] = [1] * len(self.data)

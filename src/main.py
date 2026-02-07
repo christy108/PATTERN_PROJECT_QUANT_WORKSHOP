@@ -9,6 +9,7 @@ def main():
     end_date = '2025-01-01'
     data_storage = Data_Storage(ticker,start_date , end_date)
     meta_data = data_storage.get_data()
+    
     all_returns = meta_data["Returns"].to_numpy()
 
 
@@ -112,6 +113,8 @@ def main():
     # Evalaute.get_cumulative_returns_all_strategy()
 
     #Evalaute.get_sharpe_ratio_all_strategy
+
+    
 
     Sharpe_in_trade = Evalaute.get_sharpe_ratio_in_trade_only()
     Sharpe_whole_asset = Evalaute.get_sharpe_ratio_original_asset()

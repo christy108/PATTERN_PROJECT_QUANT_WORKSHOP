@@ -1,25 +1,29 @@
 import yfinance as yf
 import numpy as np
+from latency.latency import latent_returns
 
 class Data_Storage:
     def __init__(self, ticker, start_date, end_date):
         self.ticker = ticker
         self.start_date = start_date
         self.end_date = end_date
-        self.data = yf.download(self.ticker, start=self.start_date, end=self.end_date)
+        self.data = yf.download(ticker, period="2y", interval="1d")
 
         # Manipulating the data
 
         #Only intraday
-        self.data["Returns"] = (self.data['Close'] - self.data['Open']) / self.data['Open']
+        #self.data["Returns"] = (self.data['Close'] - self.data['Open']) / self.data['Open']
+
 
         #Catches overnight jumps
         self.data["Returns"] = self.data['Close'].pct_change()
         self.data["Direction"] = np.where(self.data["Returns"] > 0, "1", "0")
         self.data["weights"] = [1] * len(self.data)
 
+
     # Utility functions
     def get_data(self):
+        
         return self.data
     
     def slice_data(self,data, lookback, index_to_start):

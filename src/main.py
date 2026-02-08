@@ -1,16 +1,19 @@
 from Data_Storage import Data_Storage
 from Final_Prediction_slow import get_final_prediction #Write efficient version later
 from Evaluate_Strategy import Evaluate_Strategy
-from plotting.plotting import plot_from_dict
+from prediction_distributions.plotting import plot_from_dict
+from prediction_distributions.distribution_logic import get_return_percentile
 
 
-
+#add a different short threhsold - limitations
 def main():
-    ticker = "^GSPC" #"ES=F"
+    ticker = "^GSPC" #"EURUSD=X"#"KC=F" ##"AAPL"
 
     start_date = '2020-02-08'
     end_date = '2026-02-08'
-    latency = False
+    latency = True
+    plot_prediction_histograms = False
+    prediction_histograms_plot_frequency = 300
     if_latency_how_much = 2 
     data_storage = Data_Storage(ticker,start_date , end_date, latency, if_latency_how_much)
     meta_data = data_storage.get_data()
@@ -41,8 +44,9 @@ def main():
     ######Trading Logic Parameters######
 
     #this is asset specific, some are less volatile and have lower return
-    expected_return_trade_threshold = 0.001
-    predicted_probs_trade_threshold = 0.50    #0.5 good with 
+    #expected_return_trade_threshold = 0.001
+    percentile_to_trade = 90
+    predicted_probs_trade_threshold = 0.5#0.50    #0.5 good with 
     transaction_costs = 0.0001
     ################################
 
@@ -83,9 +87,19 @@ def main():
 
 
 
-        #2.2-----Lets try plotting all the final predictions
+        #2.2-----ANALYSE THE FINAL PREDICTIONS
         #print(all_final_predictions)
-        plot_from_dict(all_final_predictions)
+
+        
+        return_to_trade = get_return_percentile(all_final_predictions, percentile_to_trade)
+
+        #Plot Histogram
+        #can classify the predictions histogrma to 
+        if plot_prediction_histograms == True:
+            if i % prediction_histograms_plot_frequency == 0:
+                plot_from_dict(all_final_predictions, return_to_trade)
+
+        expected_return_trade_threshold = return_to_trade
 
 
 

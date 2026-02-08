@@ -1,14 +1,17 @@
 from Data_Storage import Data_Storage
 from Final_Prediction_slow import get_final_prediction #Write efficient version later
 from Evaluate_Strategy import Evaluate_Strategy
+from plotting.plotting import plot_from_dict
+
 
 
 def main():
     ticker = "^GSPC" #"ES=F"
+
     start_date = '2020-02-08'
     end_date = '2026-02-08'
     latency = False
-    if_latency_how_much = 2 #max is 2
+    if_latency_how_much = 2 
     data_storage = Data_Storage(ticker,start_date , end_date, latency, if_latency_how_much)
     meta_data = data_storage.get_data()
     
@@ -18,7 +21,7 @@ def main():
     else:
         all_returns = meta_data["Returns"].to_numpy()
 
-    #print(meta_data)
+
 
 
     ####### Model Parameters #######
@@ -80,6 +83,11 @@ def main():
 
 
 
+        #2.2-----Lets try plotting all the final predictions
+        #print(all_final_predictions)
+        plot_from_dict(all_final_predictions)
+
+
 
         #3----Trade Logic
 
@@ -139,6 +147,7 @@ def main():
     "prob_threshold": predicted_probs_trade_threshold,
     "trans_costs": transaction_costs,
     "total_trades": len(strategy_returns_in_trades_only), # Useful extra info
+    "latency": latency,
     "Sharpe Ratio": Sharpe_in_trade
 }
     Evalaute.plot_strategy_returns_in_trades_only_with_parameters(strategy_params)

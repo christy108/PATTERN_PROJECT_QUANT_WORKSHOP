@@ -1,18 +1,24 @@
 import yfinance as yf
 import numpy as np
-
+import pandas as pd
 class Data_Storage:
-    def __init__(self, ticker, start_date, end_date):
+    def __init__(self, ticker, start_date, end_date, latency = True):
         self.ticker = ticker
         self.start_date = start_date
         self.end_date = end_date
         self.data = yf.download(self.ticker, start=self.start_date, end=self.end_date)
 
-        # Manipulating the data
+         # Manipulating the data
         self.data["Returns"] = self.data['Close'].pct_change()
         self.data["Direction"] = np.where(self.data["Returns"] > 0, "1", "0")
         self.data["weights"] = [1] * len(self.data)
 
+        #Observing the returns if we didnt have latency
+        if latency == False:
+            print("Make sure start date is two years prior from today")
+            self.data["non_latent_returns"]  = self.merge_download_non_latent_returns()
+
+       
     # Utility functions
     def get_data(self):
         return self.data
@@ -53,3 +59,56 @@ class Data_Storage:
         if amount_to_cut > 0:
             result.extend([1] * amount_to_cut)
         return result
+    
+
+    def download_non_latent_returns(self, latent_hours=1):
+
+        "Downloads 2y of hourly data, calculates the return of non latent closes"
+        "The actual price we buy and sell at is the end of day closes"
+        "The returns we are calucalting is where we ask the market to buy or sell, aka one, two, three hours before the end of the day"
+        "These returns assume no latency"
+
+        hourly_data = yf.download(self.ticker, period="2y", interval="1h", auto_adjust=False, progress=False)
+
+        #group each day in the hourly data to then itterate.
+        grouped = hourly_data.groupby(hourly_data.index.date)
+
+        non_latency = latent_hours + 1
+        dict_list = []
+        for date, day_df in grouped:
+            dict_list.append({
+                "Date": date,
+                "non_latent_close": day_df["Close"].iloc[-non_latency]
+            })
+        new_df = pd.DataFrame(dict_list)
+        new_df["non_latent_returns"] = new_df["non_latent_close"].pct_change()
+
+        
+        return new_df
+    
+
+    def merge_download_non_latent_returns(self):
+
+        "Merge the latent returns with non latent returns for as much data as we have"
+        non_latent_df = self.download_non_latent_returns()
+
+        first_day_non_latent_returns = non_latent_df["Date"].iloc[0]
+
+        updated_non_latency = self.data['Returns'].copy()
+        updated_non_latency.name = 'non_latent_returns'
+        
+        # We set 'Date' as index and filter for dates AFTER the cutoff
+        updates = non_latent_df.set_index('Date')
+        updates = updates.loc[updates.index > first_day_non_latent_returns, 'non_latent_returns']
+        
+        # 3. Apply the update
+        # Because both are now indexed by Date, Pandas aligns them perfectly
+        updated_non_latency.update(updates)
+
+        
+        
+        self.data['non_latent_returns'] = updated_non_latency
+
+        #self.data.to_csv("Debug.csv")
+        
+        return updated_non_latency

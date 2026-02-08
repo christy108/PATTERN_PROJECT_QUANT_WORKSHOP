@@ -5,10 +5,11 @@ from Evaluate_Strategy import Evaluate_Strategy
 
 def main():
     ticker = "^GSPC" #"ES=F"
-    start_date = '2022-02-08'
+    start_date = '2020-02-08'
     end_date = '2026-02-08'
     latency = False
-    data_storage = Data_Storage(ticker,start_date , end_date, latency)
+    if_latency_how_much = 2 #max is 2
+    data_storage = Data_Storage(ticker,start_date , end_date, latency, if_latency_how_much)
     meta_data = data_storage.get_data()
     
     if latency == False:

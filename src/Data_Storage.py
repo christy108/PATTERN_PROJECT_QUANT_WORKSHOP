@@ -2,12 +2,17 @@ import yfinance as yf
 import numpy as np
 import pandas as pd
 class Data_Storage:
-    def __init__(self, ticker, start_date, end_date, latency = True):
+    def __init__(self, ticker, start_date, end_date, latency, if_latency_how_much):
         self.ticker = ticker
         self.start_date = start_date
         self.end_date = end_date
         self.data = yf.download(self.ticker, start=self.start_date, end=self.end_date)
 
+        #Basically how much prior to the end of day close are we signalling to make a trade
+        #Limitation: There is some lookahead bias, we make a trade x hours prior to the close, 
+        #with a model trained on the data that weve already seen after 1 hour, to predict the next day.
+        #bascially we need to train the model on the non latent returns.
+        self.if_latency_how_much = if_latency_how_much
          # Manipulating the data
         self.data["Returns"] = self.data['Close'].pct_change()
         self.data["Direction"] = np.where(self.data["Returns"] > 0, "1", "0")
@@ -61,7 +66,7 @@ class Data_Storage:
         return result
     
 
-    def download_non_latent_returns(self, latent_hours=1):
+    def download_non_latent_returns(self):
 
         "Downloads 2y of hourly data, calculates the return of non latent closes"
         "The actual price we buy and sell at is the end of day closes"
@@ -77,7 +82,7 @@ class Data_Storage:
         #group each day in the hourly data to then itterate.
         grouped = hourly_data.groupby(hourly_data.index.date)
 
-        non_latency = latent_hours + 1
+        non_latency = self.if_latency_how_much + 1
         dict_list = []
         for date, day_df in grouped:
             dict_list.append({

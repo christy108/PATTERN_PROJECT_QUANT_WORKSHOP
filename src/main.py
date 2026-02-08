@@ -5,11 +5,20 @@ from Evaluate_Strategy import Evaluate_Strategy
 
 def main():
     ticker = "^GSPC" #"ES=F"
-    start_date = '2015-01-01'
-    end_date = '2025-01-01'
-    data_storage = Data_Storage(ticker,start_date , end_date)
+    start_date = '2020-02-08'
+    end_date = '2026-02-08'
+    latency = False
+    if_latency_how_much = 2 #max is 2
+    data_storage = Data_Storage(ticker,start_date , end_date, latency, if_latency_how_much)
     meta_data = data_storage.get_data()
-    all_returns = meta_data["Returns"].to_numpy()
+    
+    if latency == False:
+            print("Make sure start date is two years prior from today")
+            all_returns = meta_data["non_latent_returns"].to_numpy()
+    else:
+        all_returns = meta_data["Returns"].to_numpy()
+
+    #print(meta_data)
 
 
     ####### Model Parameters #######

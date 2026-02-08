@@ -70,6 +70,10 @@ class Data_Storage:
 
         hourly_data = yf.download(self.ticker, period="2y", interval="1h", auto_adjust=False, progress=False)
 
+        # If the ticker is in the columns (MultiIndex), flatten it immediately
+        if isinstance(hourly_data.columns, pd.MultiIndex):
+            hourly_data = hourly_data.droplevel(1, axis=1) # Drop the Ticker level
+
         #group each day in the hourly data to then itterate.
         grouped = hourly_data.groupby(hourly_data.index.date)
 
@@ -83,7 +87,6 @@ class Data_Storage:
         new_df = pd.DataFrame(dict_list)
         new_df["non_latent_returns"] = new_df["non_latent_close"].pct_change()
 
-        
         return new_df
     
 
@@ -104,11 +107,14 @@ class Data_Storage:
         # 3. Apply the update
         # Because both are now indexed by Date, Pandas aligns them perfectly
         updated_non_latency.update(updates)
-
-        
         
         self.data['non_latent_returns'] = updated_non_latency
 
-        #self.data.to_csv("Debug.csv")
+        # print(non_latent_df)
+
+        # print(self.data)
+
+
+        # #self.data.to_csv("Debug.csv")
         
         return updated_non_latency

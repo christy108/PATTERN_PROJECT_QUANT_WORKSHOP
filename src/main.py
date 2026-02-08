@@ -4,8 +4,11 @@ from Evaluate_Strategy import Evaluate_Strategy
 from prediction_distributions.plotting import plot_from_dict
 from prediction_distributions.distribution_logic import get_return_percentile
 
-
-#add a different short threhsold - limitations
+#Limitations:
+# add a different short threhsold - limitations
+# filter outlier returns when training the data
+# automated way to find lookback and weight recent data
+# more implement the wieght lag thing based on sample size
 def main():
     ticker = "^GSPC" #"EURUSD=X"#"KC=F" ##"AAPL"
 

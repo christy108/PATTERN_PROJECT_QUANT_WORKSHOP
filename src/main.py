@@ -4,6 +4,7 @@ from Evaluate_Strategy import Evaluate_Strategy
 from prediction_distributions.plotting import plot_from_dict
 from prediction_distributions.distribution_logic import get_return_percentile
 from vol_betsize.vol_mechanics import predict_next_day_volatility, bet_size_from_next_day_vols
+from compare_parameter_plots import plot_comparison
 
 #Limitations:
 # add a different short threhsold - limitations 100% need to
@@ -18,7 +19,7 @@ def main():
 
     latency = True
     apply_vol_betsizing = False
-    plot_prediction_histograms = True
+    plot_prediction_histograms = False
 
     prediction_histograms_plot_frequency = 300
     if_latency_how_much = 1
@@ -170,7 +171,7 @@ def main():
     Evalaute = Evaluate_Strategy(oringinal_asset_returns,strategy_returns_in_trades_only, all_strategy_returns)
     # Evalaute.get_cumulative_returns_in_trades_only()
 
-    # Evalaute.get_cumulative_returns_all_strategy()
+    cum_returns = Evalaute.get_cumulative_returns_all_strategy()
 
     #Evalaute.get_sharpe_ratio_all_strategy
 
@@ -202,23 +203,13 @@ def main():
 
     if apply_vol_betsizing == True:
         Evalaute.plot_dynamic_betsize(betsize_list)
+
+
+    return Evalaute
+    #return cum_returns , Sharpe_in_trade, strategy_params
   
 
     
-
-
-
-
-
-
-    
-   
-
-
-
-
-
-
 
 
 
@@ -229,4 +220,25 @@ def main():
 if __name__ == "__main__":
     print("Hello Leo")
     print("Hello World")
-    main()
+    #main()
+
+   
+    # Run 1: Latency Enabled
+    print("Running Strategy 1...")
+
+    
+    #lookback=300
+    eval_latency = main() 
+    
+    # Run 2: No Latency
+    print("Running Strategy 2...")
+    
+    #lookback=300
+    eval_no_latency = main()
+
+    # Compare them
+    plot_comparison(
+        eval_latency, "With Latency", 
+        eval_no_latency, "No Latency", 
+        title="Impact of Latency on Cumulative Returns"
+    )

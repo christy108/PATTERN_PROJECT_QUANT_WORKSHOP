@@ -10,6 +10,9 @@ def plot_comparison(eval1, label1, eval2, label2, strategy_params1, title="Strat
     # 2. Get Sharpe Ratios
     sharpe1 = eval1.get_sharpe_ratio_in_trade_only()
     sharpe2 = eval2.get_sharpe_ratio_in_trade_only()
+
+    # sharpe1 = eval1.get_sharpe_ratio_all_strategy()
+    # sharpe2 = eval2.get_sharpe_ratio_all_strategy()
     
     # 3. Plot both with Sharpe Ratios in the labels
     # Using :.2f ensures the number doesn't have 10 decimal places

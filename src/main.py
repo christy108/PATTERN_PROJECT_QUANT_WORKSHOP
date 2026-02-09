@@ -13,15 +13,16 @@ from compare_parameter_plots import plot_comparison
 # more implement the wieght lag thing based on sample size
 
 
-def main(apply_vol_betsizing):
+def main():
     ticker = "^GSPC" #"AAPL" #"KC=F"#"^GSPC" #"EURUSD=X"#"KC=F" #
 
     start_date = '2020-02-08'
     end_date = '2026-02-08'
 
     latency = True
-    #apply_vol_betsizing = True
+    apply_vol_betsizing = False
     plot_prediction_histograms = False
+    dynamic_threshold_to_trade = True
 
     prediction_histograms_plot_frequency = 300
     if_latency_how_much = 1
@@ -54,7 +55,8 @@ def main(apply_vol_betsizing):
     ######Trading Logic Parameters######
 
     #this is asset specific, some are less volatile and have lower return
-    #expected_return_trade_threshold = 0.001
+    if dynamic_threshold_to_trade == False:
+        expected_return_trade_threshold = 0.001
     percentile_to_trade = 90
     predicted_probs_trade_threshold = 0.5#0.50    #0.5 good with 
     transaction_costs = 0.0001
@@ -122,16 +124,16 @@ def main(apply_vol_betsizing):
         #2.2-----ANALYSE THE FINAL PREDICTIONS
         ##print(all_final_predictions)
 
-        
-        return_to_trade = get_return_percentile(all_final_predictions, percentile_to_trade)
-
+        if dynamic_threshold_to_trade == True:
+            return_to_trade = get_return_percentile(all_final_predictions, percentile_to_trade)
+            expected_return_trade_threshold = return_to_trade
         #Plot Histogram
         #can classify the predictions histogrma to 
         if plot_prediction_histograms == True:
             if i % prediction_histograms_plot_frequency == 0:
                 plot_from_dict(all_final_predictions, return_to_trade, i)
 
-        expected_return_trade_threshold = return_to_trade
+        
 
 
 
@@ -192,7 +194,7 @@ def main(apply_vol_betsizing):
     "weight_recent": weight_recent_data,
     "weight_type": Weight_type_in_lags,
     "fringe_weight": fringe_weight_if_triangle,
-    "last_ret_threshold": expected_return_trade_threshold,
+    "ret_threshold": expected_return_trade_threshold,
     "percentile_to_trade": percentile_to_trade,
     "prob_threshold": predicted_probs_trade_threshold,
     "trans_costs": transaction_costs,
@@ -226,22 +228,29 @@ if __name__ == "__main__":
 
    
     # Run 1: Latency Enabled
-    #print("Running Strategy 1...")
+    print("Running Strategy 1...")
 
     
 
     #latency = True
-    apply_vol_betsizing = False
-    
-    eval_no_change, strategy_params1 = main(apply_vol_betsizing) 
+    #apply_vol_betsizing = False
+    #weight_recent_data = 3
+    #Weight_type_in_lags = "triangle"
+    dynamic_threshold_to_trade = True
+
+    eval_no_change, strategy_params1 = main(dynamic_threshold_to_trade) 
     
     # Run 2: No Latency
-    #print("Running Strategy 2...")
+    print("Running Strategy 2...")
     
     #lookback=600
-    apply_vol_betsizing = True
+    #apply_vol_betsizing = True
     #latency = False
-    eval_change, strategy_params2 = main(apply_vol_betsizing)
+    #weight_recent_data = 6
+    #Weight_type_in_lags = "equal"
+
+    dynamic_threshold_to_trade = False
+    eval_change, strategy_params2 = main(dynamic_threshold_to_trade)
 
 
 
@@ -252,9 +261,9 @@ if __name__ == "__main__":
 
     # Compare them
     plot_comparison(
-        eval_no_change, "Base-Best Parameters", 
-        eval_change, "Volatility Bet Size Logic", 
+        eval_no_change, "Base-Best Parameters (Dynamic Trade Threshold)", 
+        eval_change, "Fixed Trade Threshold", 
         strategy_params1,
-        title="Impact of Vol Betsize"
+        title="Impact of Dynamic Trade Threshold"
         
     )

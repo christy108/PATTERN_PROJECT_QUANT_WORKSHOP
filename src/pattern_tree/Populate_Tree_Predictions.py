@@ -17,7 +17,7 @@ def populate_tree_predictions(weight_updated_slice):
 
     #Sliding Window to get info at head increment
     for length in range(1, n + 1):
-        print(f"window length: {length}")
+        #print(f"window length: {length}")
         for i in window.get_start_indices_for_length(length):
             pattern = [str(d) for d in direction_list.iloc[i : i + length]]
             last_index = i + length - 1
@@ -29,13 +29,13 @@ def populate_tree_predictions(weight_updated_slice):
 
         leaves_at_depth = tree.count_nodes_at_depth(length)
         if 2**length > leaves_at_depth:
-            print(f"  stop: 2^{length}={2**length} > {leaves_at_depth} leaves at depth {length}; pruning depth {length}")
+            #print(f"  stop: 2^{length}={2**length} > {leaves_at_depth} leaves at depth {length}; pruning depth {length}")
             tree.prune_at_depth(length)
             break
     prediction_lags_length = length - 2
     tree.compute_derived_stats()
     return tree, prediction_lags_length
-    # tree.print_paths_with_expected_return_bounded(lower=-0.015, upper=0.015)
+    # tree.#print_paths_with_expected_return_bounded(lower=-0.015, upper=0.015)
 
 
     
@@ -52,7 +52,7 @@ def populate_tree_predictions_fast_version(weight_updated_slice):
     n = len(directions)
 
     for length in range(1, n + 1):
-        print(f"window length: {length}")
+        #print(f"window length: {length}")
         
         # Get indices once
         indices = window.get_start_indices_for_length(length)
@@ -78,7 +78,7 @@ def populate_tree_predictions_fast_version(weight_updated_slice):
 
         leaves_at_depth = tree.count_nodes_at_depth(length)
         if 2**length > leaves_at_depth:
-            print(f"stop: 2^{length} > {leaves_at_depth}; pruning depth {length}")
+            #print(f"stop: 2^{length} > {leaves_at_depth}; pruning depth {length}")
             tree.prune_at_depth(length)
             break
             

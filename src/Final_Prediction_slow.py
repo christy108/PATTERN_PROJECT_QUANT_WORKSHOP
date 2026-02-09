@@ -1,4 +1,4 @@
-from pattern_tree.populate_tree_predictions import populate_tree_predictions, populate_tree_predictions_fast_version
+from pattern_tree.Populate_Tree_Predictions import populate_tree_predictions, populate_tree_predictions_fast_version
 from Weighted_Average import calculate_weighted_averages, weights_to_average
 
 

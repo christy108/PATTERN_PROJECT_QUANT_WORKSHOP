@@ -6,16 +6,18 @@ from prediction_distributions.distribution_logic import get_return_percentile
 from vol_betsize.vol_mechanics import predict_next_day_volatility, bet_size_from_next_day_vols
 
 #Limitations:
-# add a different short threhsold - limitations
+# add a different short threhsold - limitations 100% need to
 # filter outlier returns when training the data
 # automated way to find lookback and weight recent data
 # more implement the wieght lag thing based on sample size
 def main():
-    ticker = "^GSPC" #"EURUSD=X"#"KC=F" ##"AAPL"
+    ticker = "^GSPC" #"AAPL" #"KC=F"#"^GSPC" #"EURUSD=X"#"KC=F" #
 
     start_date = '2020-02-08'
     end_date = '2026-02-08'
     latency = True
+    apply_vol_betsizing = False
+    
     plot_prediction_histograms = False
     prediction_histograms_plot_frequency = 300
     if_latency_how_much = 2 
@@ -67,6 +69,7 @@ def main():
     strategy_returns_in_trades_only = []
     all_strategy_returns = []
     vol_history_list = []
+    betsize_list = []
 
 
     #1--- Itterate through timeseries
@@ -93,17 +96,24 @@ def main():
 
         #2.21-----VOLATILITY AND BET SIZING
         #uses past 100 day returns to predict the next vol
-       
-        predicted_next_day_vol = predict_next_day_volatility(all_returns[1:], current_head_index_of_window)
-        vol_history_list.append(predicted_next_day_vol)
 
-        if len(vol_history_list) > 100:
-            betsize = bet_size_from_next_day_vols()
+        if apply_vol_betsizing == True:
+            
+            predicted_next_day_vol = predict_next_day_volatility(all_returns[1:], current_head_index_of_window)
+            vol_history_list.append(predicted_next_day_vol)
 
+            if len(vol_history_list) > 100:
+                betsize = bet_size_from_next_day_vols(predicted_next_day_vol, vol_history_list[-100:])
+            else:
+                betsize = bet_size_from_next_day_vols(predicted_next_day_vol, vol_history_list)
 
+            betsize_list.append(betsize*100)
 
-        print(predicted_next_day_vol)
-
+            print("Betsize")
+            print(predicted_next_day_vol, betsize)
+        else:
+            betsize = 1
+     
 
         #2.2-----ANALYSE THE FINAL PREDICTIONS
         #print(all_final_predictions)
@@ -128,7 +138,7 @@ def main():
         #Long
         if predicted_return > expected_return_trade_threshold and predicted_probs > predicted_probs_trade_threshold:
             
-            net_long_actual_return = actual_return - transaction_costs
+            net_long_actual_return = (actual_return - transaction_costs) *betsize
             
             strategy_returns_in_trades_only.append(net_long_actual_return)
             all_strategy_returns.append(net_long_actual_return)
@@ -138,7 +148,7 @@ def main():
         elif predicted_return < -expected_return_trade_threshold and predicted_probs < (1 - predicted_probs_trade_threshold):
             
             #We short thus -
-            net_short_actual_return = -actual_return - transaction_costs
+            net_short_actual_return = (-actual_return - transaction_costs) * betsize
             strategy_returns_in_trades_only.append(net_short_actual_return)
             all_strategy_returns.append(net_short_actual_return)
             print("Short")
@@ -187,8 +197,18 @@ def main():
     Evalaute.plot_strategy_returns_all_strategy_with_parameters(strategy_params)
     Evalaute.plot_original_asset_returns_with_parameters(Sharpe_whole_asset)
 
-    # print(strategy_returns_in_trades_only)
-    # print(all_strategy_returns)
+    if apply_vol_betsizing == True:
+        Evalaute.plot_dynamic_betsize(betsize_list)
+  
+
+    
+
+
+
+
+
+
+    
    
 
 

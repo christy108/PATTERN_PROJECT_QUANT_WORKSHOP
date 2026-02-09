@@ -13,6 +13,7 @@ class Evaluate_Strategy:
         self.all_strategy_returns = pd.Series(all_strategy_returns)
         self.asset_returns = pd.Series(asset_returns)
         
+        
     
 
     def get_cumulative_returns_in_trades_only(self):
@@ -291,3 +292,50 @@ class Evaluate_Strategy:
         
         plt.tight_layout()
         plt.show()
+
+
+
+    def plot_dynamic_betsize(self, betsize_list):
+        """
+        Initializes betsize_list as a pandas Series and plots the percentage 
+        of portfolio invested per trade with a bright green line and a mean reference.
+        """
+        # 1. Initialize data
+        self.betsize_list = pd.Series(betsize_list)
+        mean_val = self.betsize_list.mean()
+        
+        # 2. Setup Figure
+        plt.figure(figsize=(12, 7))
+        
+        # 3. Plotting logic
+        # Using 'lime' or '#00FF00' for that bright green look
+        plt.plot(self.betsize_list.index, 
+                self.betsize_list.values, 
+                label='Bet Size per Trade', 
+                color='lime', 
+                linewidth=2)
+        
+        # Add the mean line
+        plt.axhline(mean_val, 
+                    color='red', 
+                    linestyle='--', 
+                    linewidth=1.5, 
+                    label=f'Mean Bet Size: {mean_val:.2f}%')
+        
+        # Horizontal line at 0 for baseline
+        plt.axhline(0, color='black', linestyle='-', linewidth=1, alpha=0.5)
+
+        # 4. Styling
+        # Setting a slightly darker background often makes bright green pop better
+        # plt.gca().set_facecolor('#2b2b2b') # Uncomment if you want a dark 'terminal' look
+        
+        plt.title('Percentage of Portfolio Invested per Trade', fontsize=14, fontweight='bold')
+        plt.xlabel('Trade Number', fontsize=12)
+        plt.ylabel('Portfolio Invested (%)', fontsize=12)
+        
+        plt.grid(True, which='both', linestyle='--', alpha=0.3)
+        plt.legend(loc='upper left', fontsize=10)
+        
+        plt.tight_layout()
+        plt.show()
+

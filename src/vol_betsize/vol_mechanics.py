@@ -47,6 +47,9 @@ def bet_size_from_next_day_vols(
     max_bet_fraction= 1,
     z_clip=2.5
 ):
+    
+
+    "betsize between 0 and 1, where betsize is 1 - the normalised vol in the last 100 days between 0 and 1"
     """
     Compute bet size based on next-day volatility using Z-score normalization.
 

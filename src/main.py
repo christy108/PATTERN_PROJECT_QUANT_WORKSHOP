@@ -3,6 +3,7 @@ from Final_Prediction_slow import get_final_prediction #Write efficient version 
 from Evaluate_Strategy import Evaluate_Strategy
 from prediction_distributions.plotting import plot_from_dict
 from prediction_distributions.distribution_logic import get_return_percentile
+from vol_betsize.vol_mechanics import predict_next_day_volatility, bet_size_from_next_day_vols
 
 #Limitations:
 # add a different short threhsold - limitations
@@ -65,6 +66,7 @@ def main():
 
     strategy_returns_in_trades_only = []
     all_strategy_returns = []
+    vol_history_list = []
 
 
     #1--- Itterate through timeseries
@@ -88,6 +90,19 @@ def main():
         print(lagged_pattern_at_head, predicted_return, predicted_probs,actual_return, current_head_index_of_window, "of",index_to_stop )
         
 
+
+        #2.21-----VOLATILITY AND BET SIZING
+        #uses past 100 day returns to predict the next vol
+       
+        predicted_next_day_vol = predict_next_day_volatility(all_returns[1:], current_head_index_of_window)
+        vol_history_list.append(predicted_next_day_vol)
+
+        if len(vol_history_list) > 100:
+            betsize = bet_size_from_next_day_vols()
+
+
+
+        print(predicted_next_day_vol)
 
 
         #2.2-----ANALYSE THE FINAL PREDICTIONS
@@ -160,7 +175,8 @@ def main():
     "weight_recent": weight_recent_data,
     "weight_type": Weight_type_in_lags,
     "fringe_weight": fringe_weight_if_triangle,
-    "ret_threshold": expected_return_trade_threshold,
+    "last_ret_threshold": expected_return_trade_threshold,
+    "percentile_to_trade": percentile_to_trade,
     "prob_threshold": predicted_probs_trade_threshold,
     "trans_costs": transaction_costs,
     "total_trades": len(strategy_returns_in_trades_only), # Useful extra info

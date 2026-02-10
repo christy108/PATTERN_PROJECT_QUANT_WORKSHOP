@@ -4,7 +4,7 @@ from Evaluate_Strategy import Evaluate_Strategy
 from prediction_distributions.plotting import plot_from_dict
 from prediction_distributions.distribution_logic import get_return_percentile
 from vol_betsize.vol_mechanics import predict_next_day_volatility, bet_size_from_next_day_vols
-from compare_parameter_plots import plot_comparison
+from compare_parameter_plots import plot_comparison, plot_comparison_with_original_asset
 
 #Limitations:
 # add a different short threhsold - limitations 100% need to
@@ -13,14 +13,14 @@ from compare_parameter_plots import plot_comparison
 # more implement the wieght lag thing based on sample size
 
 
-def main():
+def main(percentile_to_trade):
     ticker = "^GSPC" #"AAPL" #"KC=F"#"^GSPC" #"EURUSD=X"#"KC=F" #
 
     start_date = '2020-02-08'
     end_date = '2026-02-08'
 
     latency = True
-    apply_vol_betsizing = False
+    apply_vol_betsizing = False #True #
     plot_prediction_histograms = False
     dynamic_threshold_to_trade = True
 
@@ -57,7 +57,7 @@ def main():
     #this is asset specific, some are less volatile and have lower return
     if dynamic_threshold_to_trade == False:
         expected_return_trade_threshold = 0.001
-    percentile_to_trade = 90
+    #percentile_to_trade = 90
     predicted_probs_trade_threshold = 0.5#0.50    #0.5 good with 
     transaction_costs = 0.0001
     ################################
@@ -236,9 +236,9 @@ if __name__ == "__main__":
     #apply_vol_betsizing = False
     #weight_recent_data = 3
     #Weight_type_in_lags = "triangle"
-    dynamic_threshold_to_trade = True
-
-    eval_no_change, strategy_params1 = main(dynamic_threshold_to_trade) 
+    #dynamic_threshold_to_trade = True
+    percentile_to_trade = 90
+    eval_no_change, strategy_params1 = main(percentile_to_trade) 
     
     # Run 2: No Latency
     print("Running Strategy 2...")
@@ -249,8 +249,9 @@ if __name__ == "__main__":
     #weight_recent_data = 6
     #Weight_type_in_lags = "equal"
 
-    dynamic_threshold_to_trade = False
-    eval_change, strategy_params2 = main(dynamic_threshold_to_trade)
+    #dynamic_threshold_to_trade = False
+    percentile_to_trade = 75
+    eval_change, strategy_params2 = main(percentile_to_trade)
 
 
 
@@ -261,9 +262,9 @@ if __name__ == "__main__":
 
     # Compare them
     plot_comparison(
-        eval_no_change, "Base-Best Parameters (Dynamic Trade Threshold)", 
-        eval_change, "Fixed Trade Threshold", 
+        eval_no_change, "Base Parameters (Trade Threshold Percentile: 90) ", 
+        eval_change, "Trade Threshold Percentile: 75)", 
         strategy_params1,
-        title="Impact of Dynamic Trade Threshold"
+        title="Impact of Lowering the Trade Threshold Percentile"
         
     )

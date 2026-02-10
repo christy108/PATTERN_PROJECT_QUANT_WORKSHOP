@@ -20,7 +20,7 @@ class Data_Storage:
 
         #Observing the returns if we didnt have latency
         if latency == False:
-            print("Make sure start date is two years prior from today")
+            #print("Make sure start date is two years prior from today")
             self.data["non_latent_returns"]  = self.merge_download_non_latent_returns()
 
        
@@ -42,7 +42,7 @@ class Data_Storage:
             head_index = index_to_start 
             tail_index = index_to_start - lookback 
             data = data.iloc[tail_index:head_index]
-            print(f"Data sliced from index {tail_index} to {head_index}")
+            #print(f"Data sliced from index {tail_index} to {head_index}")
             return data
 
     # Main functions
@@ -115,9 +115,9 @@ class Data_Storage:
         
         self.data['non_latent_returns'] = updated_non_latency
 
-        # print(non_latent_df)
+        # #print(non_latent_df)
 
-        # print(self.data)
+        # #print(self.data)
 
 
         # #self.data.to_csv("Debug.csv")

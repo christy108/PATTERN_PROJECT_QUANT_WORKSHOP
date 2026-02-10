@@ -11,6 +11,8 @@ from compare_parameter_plots import plot_comparison
 # filter outlier returns when training the data
 # automated way to find lookback and weight recent data
 # more implement the wieght lag thing based on sample size
+
+
 def main():
     ticker = "^GSPC" #"AAPL" #"KC=F"#"^GSPC" #"EURUSD=X"#"KC=F" #
 
@@ -20,6 +22,7 @@ def main():
     latency = True
     apply_vol_betsizing = False
     plot_prediction_histograms = False
+    dynamic_threshold_to_trade = True
 
     prediction_histograms_plot_frequency = 300
     if_latency_how_much = 1
@@ -27,7 +30,7 @@ def main():
     meta_data = data_storage.get_data()
     
     if latency == False:
-            print("Make sure start date is two years prior from today")
+            #print("Make sure start date is two years prior from today")
             all_returns = meta_data["non_latent_returns"].to_numpy()
     else:
         all_returns = meta_data["Returns"].to_numpy()
@@ -52,7 +55,8 @@ def main():
     ######Trading Logic Parameters######
 
     #this is asset specific, some are less volatile and have lower return
-    #expected_return_trade_threshold = 0.001
+    if dynamic_threshold_to_trade == False:
+        expected_return_trade_threshold = 0.001
     percentile_to_trade = 90
     predicted_probs_trade_threshold = 0.5#0.50    #0.5 good with 
     transaction_costs = 0.0001
@@ -92,7 +96,7 @@ def main():
         next_increment_index = current_head_index_of_window + 1
         actual_return = all_returns[next_increment_index]
 
-        print(lagged_pattern_at_head, predicted_return, predicted_probs,actual_return, current_head_index_of_window, "of",index_to_stop )
+        #print(lagged_pattern_at_head, predicted_return, predicted_probs,actual_return, current_head_index_of_window, "of",index_to_stop )
         
 
 
@@ -111,25 +115,25 @@ def main():
 
             betsize_list.append(betsize*100)
 
-            print("Betsize")
-            print(predicted_next_day_vol, betsize)
+            ##print("Betsize")
+            #print(predicted_next_day_vol, betsize)
         else:
             betsize = 1
      
 
         #2.2-----ANALYSE THE FINAL PREDICTIONS
-        #print(all_final_predictions)
+        ##print(all_final_predictions)
 
-        
-        return_to_trade = get_return_percentile(all_final_predictions, percentile_to_trade)
-
+        if dynamic_threshold_to_trade == True:
+            return_to_trade = get_return_percentile(all_final_predictions, percentile_to_trade)
+            expected_return_trade_threshold = return_to_trade
         #Plot Histogram
         #can classify the predictions histogrma to 
         if plot_prediction_histograms == True:
             if i % prediction_histograms_plot_frequency == 0:
                 plot_from_dict(all_final_predictions, return_to_trade, i)
 
-        expected_return_trade_threshold = return_to_trade
+        
 
 
 
@@ -144,17 +148,17 @@ def main():
             
             strategy_returns_in_trades_only.append(net_long_actual_return)
             all_strategy_returns.append(net_long_actual_return)
-            print("Long")
+            #print("Long")
         
         #Short
         elif predicted_return < -expected_return_trade_threshold and predicted_probs < (1 - predicted_probs_trade_threshold):
             
             #We short thus -
             net_short_actual_return = (-actual_return - transaction_costs) * betsize
-            print(net_short_actual_return)
+            #print(net_short_actual_return)
             strategy_returns_in_trades_only.append(net_short_actual_return)
             all_strategy_returns.append(net_short_actual_return)
-            print("Short")
+            #print("Short")
         
         #Dont Trade
         else:
@@ -185,28 +189,28 @@ def main():
     "date_start_end": [start_date, end_date],
     "index_start_end": [index_to_start,index_to_stop],
     "lookback": lookback,
+    "latency": latency,
     "apply_vol_betsizing":apply_vol_betsizing,
     "weight_recent": weight_recent_data,
     "weight_type": Weight_type_in_lags,
     "fringe_weight": fringe_weight_if_triangle,
-    "last_ret_threshold": expected_return_trade_threshold,
+    "ret_threshold": expected_return_trade_threshold,
     "percentile_to_trade": percentile_to_trade,
     "prob_threshold": predicted_probs_trade_threshold,
     "trans_costs": transaction_costs,
     "total_trades": len(strategy_returns_in_trades_only), # Useful extra info
-    "latency": latency,
     "Sharpe Ratio": Sharpe_in_trade
 }
-    Evalaute.plot_strategy_returns_in_trades_only_with_parameters(strategy_params)
-    Evalaute.plot_strategy_returns_all_strategy_with_parameters(strategy_params)
-    Evalaute.plot_original_asset_returns_with_parameters(Sharpe_whole_asset)
+    # Evalaute.plot_strategy_returns_in_trades_only_with_parameters(strategy_params)
+    # Evalaute.plot_strategy_returns_all_strategy_with_parameters(strategy_params)
+    # Evalaute.plot_original_asset_returns_with_parameters(Sharpe_whole_asset)
 
-    if apply_vol_betsizing == True:
-        Evalaute.plot_dynamic_betsize(betsize_list)
+    # if apply_vol_betsizing == True:
+    #     Evalaute.plot_dynamic_betsize(betsize_list)
 
 
-    return Evalaute
-    #return cum_returns , Sharpe_in_trade, strategy_params
+    return Evalaute, strategy_params
+    
   
 
     
@@ -218,8 +222,8 @@ def main():
 
 #Make sure the triangle weights are fine for short pattern lenght/lookback
 if __name__ == "__main__":
-    print("Hello Leo")
-    print("Hello World")
+    #print("Hello Leo")
+    #print("Hello World")
     #main()
 
    
@@ -227,18 +231,39 @@ if __name__ == "__main__":
     print("Running Strategy 1...")
 
     
-    #lookback=300
-    eval_latency = main() 
+
+    #latency = True
+    #apply_vol_betsizing = False
+    #weight_recent_data = 3
+    #Weight_type_in_lags = "triangle"
+    dynamic_threshold_to_trade = True
+
+    eval_no_change, strategy_params1 = main(dynamic_threshold_to_trade) 
     
     # Run 2: No Latency
     print("Running Strategy 2...")
     
-    #lookback=300
-    eval_no_latency = main()
+    #lookback=600
+    #apply_vol_betsizing = True
+    #latency = False
+    #weight_recent_data = 6
+    #Weight_type_in_lags = "equal"
+
+    dynamic_threshold_to_trade = False
+    eval_change, strategy_params2 = main(dynamic_threshold_to_trade)
+
+
+
+
+
+
+   
 
     # Compare them
     plot_comparison(
-        eval_latency, "With Latency", 
-        eval_no_latency, "No Latency", 
-        title="Impact of Latency on Cumulative Returns"
+        eval_no_change, "Base-Best Parameters (Dynamic Trade Threshold)", 
+        eval_change, "Fixed Trade Threshold", 
+        strategy_params1,
+        title="Impact of Dynamic Trade Threshold"
+        
     )

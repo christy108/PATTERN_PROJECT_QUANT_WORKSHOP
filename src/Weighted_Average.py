@@ -103,7 +103,7 @@ def calculate_weighted_averages(pattern_lenght, tree, weights):
             weighted_average_expected_return = np.sum(weighted_average_expected_return_list)
             weighted_average_probability_of_rising = np.sum(weighted_average_probability_of_rising_list)
 
-            #print(f"Pattern: {pattern} | Weighted Average Expected Return: {weighted_average_expected_return:.6f} | Weighted Average Probability of Rising: {weighted_average_probability_of_rising:.6f}")
+            ##print(f"Pattern: {pattern} | Weighted Average Expected Return: {weighted_average_expected_return:.6f} | Weighted Average Probability of Rising: {weighted_average_probability_of_rising:.6f}")
 
             final_prediction[pattern] = {"average_expected_return": weighted_average_expected_return, "average_probability_of_rising": weighted_average_probability_of_rising}
 

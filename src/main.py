@@ -7,25 +7,26 @@ from vol_betsize.vol_mechanics import predict_next_day_volatility, bet_size_from
 from compare_parameter_plots import plot_comparison, plot_comparison_with_original_asset
 
 #Limitations:
-# add a different short threhsold - limitations 100% need to
+# add a different short threhsold -  100% need to
 # filter outlier returns when training the data
 # automated way to find lookback and weight recent data
-# more implement the wieght lag thing based on sample size
+# more implement the wieght lag based on sample size
 
 
-def main(percentile_to_trade):
-    ticker = "^GSPC" #"AAPL" #"KC=F"#"^GSPC" #"EURUSD=X"#"KC=F" #
+def main():
+    ticker = "^GSPC" #"AAPL" 
 
     start_date = '2020-02-08'
     end_date = '2026-02-08'
 
     latency = True
-    apply_vol_betsizing = False #True #
+    apply_vol_betsizing = False 
     plot_prediction_histograms = False
     dynamic_threshold_to_trade = True
 
     prediction_histograms_plot_frequency = 300
     if_latency_how_much = 1
+
     data_storage = Data_Storage(ticker,start_date , end_date, latency, if_latency_how_much)
     meta_data = data_storage.get_data()
     
@@ -41,35 +42,25 @@ def main(percentile_to_trade):
     ####### Model Parameters #######
 
     index_to_start = 300
-    index_to_stop =  meta_data.shape[0] - 2 #2??
+    index_to_stop =  meta_data.shape[0] - 2 
     lookback = 300
-
-    weight_recent_data= 3 # "weight to recent patterns" # Optimal is around 3 for 300 lookback
-
-    Weight_type_in_lags = 'triangle'  # 'triangle' or 'equal'
+    weight_recent_data= 3               # "weight to recent patterns" # Optimal is around 3 for 300 lookback
+    Weight_type_in_lags = 'triangle'    # 'triangle' or 'equal'
     #Weight_type_in_lags = "equal"
-    fringe_weight_if_triangle = 0.05  # only used if Weight_type_in_lags == 'triangle'
+    fringe_weight_if_triangle = 0.05    # only used if Weight_type_in_lags == 'triangle'
 
-    #Sometimes some parameters might result in errors.
+    #Warning: Sometimes some parameters might result in errors.
 
     ######Trading Logic Parameters######
 
-    #this is asset specific, some are less volatile and have lower return
     if dynamic_threshold_to_trade == False:
-        expected_return_trade_threshold = 0.001
-    #percentile_to_trade = 90
-    predicted_probs_trade_threshold = 0.5#0.50    #0.5 good with 
+        expected_return_trade_threshold = 0.001 #asset specific
+    percentile_to_trade = 90
+    predicted_probs_trade_threshold = 0.5  
     transaction_costs = 0.0001
+
     ################################
 
-
-    # #1--- Get Predictions for one increment ahead!
-    # all_final_predictions, prediction_lags_length = get_final_prediction(data_storage, meta_data, index_to_start, lookback, weight_recent_data, Weight_type_in_lags, fringe_weight_if_triangle)
-
-    # #Get Recent lagged pattern and output prediction
-    # lagged_pattern_at_head = "".join(map(str, Direction_list[-prediction_lags_length:]))
-    # next_increment_prediction = all_final_predictions[lagged_pattern_at_head]
-    
 
 
     strategy_returns_in_trades_only = []
@@ -95,7 +86,6 @@ def main(percentile_to_trade):
 
         next_increment_index = current_head_index_of_window + 1
         actual_return = all_returns[next_increment_index]
-
         #print(lagged_pattern_at_head, predicted_return, predicted_probs,actual_return, current_head_index_of_window, "of",index_to_stop )
         
 
@@ -112,7 +102,6 @@ def main(percentile_to_trade):
                 betsize = bet_size_from_next_day_vols(predicted_next_day_vol, vol_history_list[-100:])
             else:
                 betsize = bet_size_from_next_day_vols(predicted_next_day_vol, vol_history_list)
-
             betsize_list.append(betsize*100)
 
             ##print("Betsize")
@@ -121,7 +110,7 @@ def main(percentile_to_trade):
             betsize = 1
      
 
-        #2.2-----ANALYSE THE FINAL PREDICTIONS
+        #2.2-----ANALYSE THE FINAL PREDICTIONS AND MAKE TRADES BASED ON THE DYNAMIC THRESHOLD
         ##print(all_final_predictions)
 
         if dynamic_threshold_to_trade == True:
@@ -171,12 +160,9 @@ def main(percentile_to_trade):
     
     # Slice the array from where you started trading to where you stopped
     oringinal_asset_returns = all_returns[index_to_start + 1 : index_to_stop + 1]
-
     Evalaute = Evaluate_Strategy(oringinal_asset_returns,strategy_returns_in_trades_only, all_strategy_returns)
     # Evalaute.get_cumulative_returns_in_trades_only()
-
-    cum_returns = Evalaute.get_cumulative_returns_all_strategy()
-
+    #cum_returns = Evalaute.get_cumulative_returns_all_strategy()
     #Evalaute.get_sharpe_ratio_all_strategy
 
     Sharpe_in_trade = Evalaute.get_sharpe_ratio_in_trade_only()
@@ -201,9 +187,9 @@ def main(percentile_to_trade):
     "total_trades": len(strategy_returns_in_trades_only), # Useful extra info
     "Sharpe Ratio": Sharpe_in_trade
 }
-    # Evalaute.plot_strategy_returns_in_trades_only_with_parameters(strategy_params)
-    # Evalaute.plot_strategy_returns_all_strategy_with_parameters(strategy_params)
-    # Evalaute.plot_original_asset_returns_with_parameters(Sharpe_whole_asset)
+    Evalaute.plot_strategy_returns_in_trades_only_with_parameters(strategy_params)
+    Evalaute.plot_strategy_returns_all_strategy_with_parameters(strategy_params)
+    Evalaute.plot_original_asset_returns_with_parameters(Sharpe_whole_asset)
 
     # if apply_vol_betsizing == True:
     #     Evalaute.plot_dynamic_betsize(betsize_list)
@@ -222,36 +208,48 @@ def main(percentile_to_trade):
 
 #Make sure the triangle weights are fine for short pattern lenght/lookback
 if __name__ == "__main__":
-    #print("Hello Leo")
-    #print("Hello World")
-    #main()
+    print("Hello Leo")
+    print("Hello World")
+    main()
 
+
+
+
+
+
+
+
+
+
+
+
+    #Code Below is to compare strategies with different parameters>
    
-    # Run 1: Latency Enabled
-    print("Running Strategy 1...")
+    # # Run 1: Latency Enabled
+    # print("Running Strategy 1...")
 
     
 
-    #latency = True
-    #apply_vol_betsizing = False
-    #weight_recent_data = 3
-    #Weight_type_in_lags = "triangle"
-    #dynamic_threshold_to_trade = True
-    percentile_to_trade = 90
-    eval_no_change, strategy_params1 = main(percentile_to_trade) 
+    # #latency = True
+    # #apply_vol_betsizing = False
+    # #weight_recent_data = 3
+    # #Weight_type_in_lags = "triangle"
+    # #dynamic_threshold_to_trade = True
+    # percentile_to_trade = 90
+    # eval_no_change, strategy_params1 = main(percentile_to_trade) 
     
-    # Run 2: No Latency
-    print("Running Strategy 2...")
+    # # Run 2: No Latency
+    # print("Running Strategy 2...")
     
-    #lookback=600
-    #apply_vol_betsizing = True
-    #latency = False
-    #weight_recent_data = 6
-    #Weight_type_in_lags = "equal"
+    # #lookback=600
+    # #apply_vol_betsizing = True
+    # #latency = False
+    # #weight_recent_data = 6
+    # #Weight_type_in_lags = "equal"
 
-    #dynamic_threshold_to_trade = False
-    percentile_to_trade = 75
-    eval_change, strategy_params2 = main(percentile_to_trade)
+    # #dynamic_threshold_to_trade = False
+    # percentile_to_trade = 75
+    # eval_change, strategy_params2 = main(percentile_to_trade)
 
 
 
